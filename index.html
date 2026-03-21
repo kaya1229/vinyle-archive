@@ -8,372 +8,233 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
-        :root { --paper: #fdf8ef; --nav-bg: #1a1a1a; --vintage-dark: #2c2c2c; }
-        
-        body { 
-            font-family: 'Courier Prime', monospace; 
-            background-color: #000; 
-            margin: 0; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh; 
-            overflow: hidden;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        .app-container { 
-            width: 100%; max-width: none; height: 100vh; 
-            background-color: var(--paper); position: relative; overflow: hidden; display: flex; flex-direction: column; 
-        }
-        
-        * { -ms-overflow-style: none; scrollbar-width: none; -webkit-tap-highlight-color: transparent; }
-        *::-webkit-scrollbar { display: none !important; }
-
-        textarea, input { -webkit-user-select: text !important; user-select: text !important; }
-
-        #toast-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3000; pointer-events: none; display: flex; flex-direction: column; align-items: center; }
-        .toast { background: rgba(0, 0, 0, 0.9); color: #fff; padding: 16px 28px; border-radius: 10px; font-size: 12px; font-weight: bold; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; transform: scale(0.9); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .toast.show { opacity: 1; transform: scale(1); }
-
-        .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 450; display: none; }
-        .modal-overlay.active { display: block; }
-
-        .tab-view { display: none; flex: 1; width: 100%; height: calc(100% - 100px); position: absolute; top: 80px; left: 0; padding: 20px; overflow-y: scroll; z-index: 50; }
+        :root { --paper: #fdf8ef; --nav-bg: #1a1a1a; }
+        body { font-family: 'Courier Prime', monospace; background-color: #000; margin: 0; min-height: 100vh; overflow: hidden; }
+        .app-container { width: 100%; height: 100vh; background-color: var(--paper); position: relative; display: flex; flex-direction: column; }
+        .tab-view { display: none; flex: 1; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
         .tab-view.active { display: flex; flex-direction: column; }
-
-        #timeline-view { position: absolute; inset: 0; background: var(--paper); z-index: 10; padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; overflow-y: auto; transition: transform 0.5s ease; }
-        .timeline-card { aspect-ratio: 1/1; overflow: hidden; background: #fff; position: relative; }
-        .size-large { grid-column: span 2; grid-row: span 2; }
-
-        .popup-base { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 500; background: var(--paper); padding: 25px; border: 2px solid #000; width: 350px; max-height: 550px; display: none; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); flex-direction: column; }
-        .show { display: flex !important; }
-
-        .nav-bar { height: 100px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; z-index: 300; position: absolute; bottom: 0; width: 100%; }
-        .lp-circle { width: 46px; height: 46px; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; border: 1px solid #333; color: white; }
-        .tab-btn.active .lp-circle { background: #fff; color: black; border: 1px solid #fff; }
-        
-        .animate-spin-slow { animation: spin 12s linear infinite; }
+        #search-list { position: absolute; top: 100%; left: 0; width: 100%; z-index: 1000; background: white; border: 2px solid black; border-radius: 12px; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .nav-bar { height: 100px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; position: absolute; bottom: 0; width: 100%; z-index: 500; }
+        .lp-circle { width: 46px; height: 46px; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; color: white; border: 1px solid #333; transition: 0.3s; }
+        .tab-btn.active .lp-circle { background: #fff; color: black; transform: scale(1.1); }
+        .animate-spin-slow { animation: spin 8s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .stream-container { position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: var(--paper); padding: 20px; transition: transform 0.5s ease; z-index: 20; overflow-y: auto; }
-        .slide-down { transform: translateY(100%); }
-        .timeline-up { transform: translateY(-100%); }
-
-        .month-row { display: flex; align-items: center; gap: 10px; height: 32px; margin-bottom: 4px; }
-        .month-box { font-size: 11px; font-weight: 800; width: 45px; height: 24px; display: flex; align-items: center; justify-content: center; background: #eee5d5; border-radius: 4px; }
-        .day-grid { display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; flex: 1; }
-        .day-pixel { width: 8px; height: 8px; background: rgba(0,0,0,0.05); border-radius: 1px; }
-
-        #search-list { max-height: 250px; overflow-y: auto; z-index: 110; }
-        #gatcha-canvas-container canvas { filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1)); }
+        .popup-base { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; background: var(--paper); padding: 25px; border: 2px solid #000; width: 320px; border-radius: 24px; display: none; flex-direction: column; box-shadow: 0 30px 60px rgba(0,0,0,0.3); }
+        .show { display: flex !important; }
     </style>
 </head>
 <body>
 
-    <div class="app-container" id="main-container">
-        <div id="toast-container"></div>
-        <div id="modal-overlay" class="modal-overlay"></div>
-        <div id="gatcha-canvas-container" class="absolute inset-0 pointer-events-none z-10 hidden"></div>
-
-        <div class="app-header h-20 p-6 flex justify-between items-center z-[100]">
+    <div class="app-container">
+        <div class="h-20 p-6 flex justify-between items-center z-50">
             <span class="text-[14px] font-bold tracking-[3px]" id="header-text">WRITE</span>
-            <div class="flex items-center gap-2">
-                <div class="text-[11px] font-bold border-2 border-black px-4 py-1 rounded-full bg-white">🪙 <span id="coin-count">0</span></div>
-                <button onclick="openSettings()" class="w-7 h-7 flex items-center justify-center bg-white border-2 border-black rounded-full">⁝</button>
-            </div>
+            <div class="text-[11px] font-bold border-2 border-black px-4 py-1 rounded-full bg-white">🪙 <span id="coin-count">0</span></div>
         </div>
 
         <div id="view-write" class="tab-view active">
-            <div id="top-datetime-display" class="text-center font-bold mb-4 text-[13px] opacity-60"></div>
             <div class="relative w-full mb-6">
-                <input type="text" id="search-bar" placeholder="Search music (iTunes)..." class="w-full bg-transparent border-b-2 border-black p-2 outline-none text-[13px] italic">
-                <div id="search-list" class="hidden absolute top-full left-0 w-full border-2 border-black bg-white rounded-xl shadow-2xl mt-1"></div>
+                <input type="text" id="search-bar" placeholder="Search Music..." class="w-full bg-transparent border-b-2 border-black p-2 outline-none text-[14px] italic">
+                <div id="search-list" class="hidden"></div>
             </div>
-            <div class="bg-white rounded-[24px] h-[380px] p-6 flex flex-col shadow-inner">
+            
+            <div class="bg-white rounded-[32px] p-6 flex flex-col shadow-inner flex-1 mb-4" style="min-height: 350px;">
                 <div id="stamp-slot" class="mb-4 flex justify-center items-center h-28">
-                    <div class="w-24 h-24 border-2 border-dashed border-black/10 rounded-full flex items-center justify-center text-[10px] opacity-20 text-center uppercase">Select<br>Music</div>
+                    <div class="w-24 h-24 border-2 border-dashed border-black/10 rounded-full flex items-center justify-center text-[10px] opacity-20 text-center uppercase">Music<br>Disc</div>
                 </div>
                 <div id="song-info" class="text-center mb-4">
                     <div id="display-title" class="text-[16px] font-bold uppercase truncate"></div>
                     <div id="display-artist" class="text-[11px] opacity-40 italic truncate"></div>
                 </div>
-                <textarea id="diary" placeholder="Write down your thoughts..." class="w-full flex-1 bg-transparent outline-none resize-none text-[15px] border-t pt-4"></textarea>
+                <textarea id="diary" placeholder="Today's thought..." class="w-full flex-1 bg-transparent outline-none resize-none text-[15px] border-t pt-4"></textarea>
             </div>
-            <div class="flex justify-center gap-4 mt-6">
-                <button onclick="seal()" class="w-5/12 py-3 bg-black text-white rounded-full font-bold text-[11px]">SEAL RECORD</button>
-                <button onclick="resetWriteView()" class="w-5/12 py-3 border-2 border-black text-black rounded-full font-bold text-[11px]">RESET</button>
-            </div>
-        </div>
-
-        <div id="view-album" class="tab-view" style="padding:0; overflow:hidden;">
-            <div class="px-6 flex justify-between items-center mb-4 mt-4">
-                <span id="album-main-title" class="text-[22px] font-black uppercase tracking-tighter">2026</span>
-                <div class="w-8 h-8 bg-black text-white flex items-center justify-center rounded-lg cursor-pointer" onclick="toggleTimeline()">◴</div>
-            </div>
-            <div class="relative w-full h-full" id="swipe-area">
-                <div id="timeline-view"></div>
-                <div id="static-stream" class="stream-container"></div>
-            </div>
+            <button onclick="sealRecord()" class="w-full py-4 bg-black text-white rounded-full font-bold text-[12px] tracking-widest">SEAL RECORD</button>
         </div>
 
         <div id="view-gatcha" class="tab-view" style="padding:0; overflow:hidden;">
             <div id="gatcha-ui" class="absolute inset-0 flex items-center justify-center z-20">
-                <button id="coin-btn" onclick="startGatchaSession()" class="bg-black text-white px-8 py-4 text-[12px] font-bold tracking-[4px] rounded-full mb-[200px] shadow-2xl">⬙ INSERT COIN</button>
+                <button onclick="startGatcha()" class="bg-black text-white px-8 py-4 text-[12px] font-bold tracking-[4px] rounded-full shadow-2xl">⬙ INSERT COIN</button>
             </div>
+            <div id="canvas-container" class="absolute inset-0 pointer-events-none"></div>
         </div>
 
         <div class="nav-bar">
             <button onclick="changeTab('write')" class="tab-btn active" id="btn-write"><div class="lp-circle"><span>✎</span></div></button>
-            <button onclick="changeTab('album')" class="tab-btn" id="btn-album"><div class="lp-circle"><span>▤</span></div></button>
             <button onclick="changeTab('gatcha')" class="tab-btn" id="btn-gatcha"><div class="lp-circle"><span>⬙</span></div></button>
         </div>
 
         <div id="result-popup" class="popup-base">
             <div class="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-2 border-black">
-                <div id="res-image" class="w-full h-full bg-cover bg-center animate-spin-slow"></div>
+                <img id="res-image" src="" class="w-full h-full object-cover animate-spin-slow">
             </div>
-            <div id="res-title" class="text-center font-bold uppercase text-[15px] mb-1"></div>
-            <div id="res-artist" class="text-center text-[11px] opacity-40 italic mb-3"></div>
-            <div id="res-content" class="text-center text-[12px] opacity-70 italic px-4 mt-2 border-t pt-4 overflow-y-auto max-h-32"></div>
-            <button onclick="closeResultPopup()" class="w-full py-4 bg-black text-white rounded-full font-bold mt-6">CONFIRM</button>
-        </div>
-
-        <div id="settings-popup" class="popup-base">
-            <h2 class="text-[16px] font-bold text-center border-b pb-3 mb-6">SETTINGS</h2>
-            <button onclick="clearArchive()" class="w-full py-3 bg-red-50 text-red-600 border border-red-200 rounded-xl font-bold text-[11px]">CLEAR ALL DATA</button>
-            <button onclick="closeSettings()" class="w-full py-4 bg-black text-white rounded-full font-bold mt-6">CLOSE</button>
+            <div id="res-title" class="text-center font-bold text-[15px]"></div>
+            <div id="res-artist" class="text-center text-[11px] opacity-40 mb-4"></div>
+            <div id="res-content" class="text-center text-[12px] opacity-70 bg-black/5 p-3 rounded-xl max-h-24 overflow-y-auto"></div>
+            <button onclick="closePopup()" class="w-full py-4 bg-black text-white rounded-full font-bold mt-6 text-[11px]">CONFIRM</button>
         </div>
     </div>
 
     <script>
-        const { Engine, Render, Runner, Bodies, Composite, Events, Mouse, MouseConstraint, Body } = Matter;
         let archive = JSON.parse(localStorage.getItem('myArchive')) || [];
-        let dailySongs = JSON.parse(localStorage.getItem('dailySongs')) || {};
-        let coins = (localStorage.getItem('myCoins') === null) ? 1 : parseInt(localStorage.getItem('myCoins'));
+        let coins = parseInt(localStorage.getItem('myCoins')) || 0;
+        let selectedSong = null;
+        let engine, render, runner;
 
-        let currentAudio = new Audio();
-        let engine, runner, render, isGatchaActive = false, isTimelineOpen = false;
-
-        // 1. iTunes API Search
-        async function searchMusic() {
+        // 1. iTunes API 연동 (JSONP 방식 - GitHub Pages 최적화)
+        function searchMusic() {
             const query = document.getElementById('search-bar').value.trim();
+            if (query.length < 2) return;
+
+            // 기존 스크립트 삭제
+            const oldScript = document.getElementById('itunes-script');
+            if (oldScript) oldScript.remove();
+
+            // JSONP 호출
+            const script = document.createElement('script');
+            script.id = 'itunes-script';
+            script.src = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=5&callback=handleResponse`;
+            document.body.appendChild(script);
+        }
+
+        function handleResponse(data) {
             const list = document.getElementById('search-list');
-            if (query.length < 2) { list.classList.add('hidden'); return; }
-
-            try {
-                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=5`);
-                const data = await res.json();
-                list.innerHTML = "";
-                if (data.results.length > 0) {
-                    list.classList.remove('hidden');
-                    data.results.forEach(track => {
-                        const div = document.createElement('div');
-                        div.className = "p-4 cursor-pointer border-b hover:bg-gray-50 flex items-center gap-3";
-                        div.innerHTML = `
-                            <img src="${track.artworkUrl60}" class="w-10 h-10 rounded shadow-sm">
-                            <div class="overflow-hidden">
-                                <div class="font-bold text-[11px] truncate">${track.trackName}</div>
-                                <div class="text-[10px] opacity-40 truncate">${track.artistName}</div>
-                            </div>`;
-                        div.onclick = () => pickMusic(track.trackName, track.artistName, track.artworkUrl100.replace('100x100', '400x400'), track.previewUrl);
-                        list.appendChild(div);
-                    });
-                }
-            } catch (e) { console.error("API Error", e); }
+            list.innerHTML = "";
+            if (data.results && data.results.length > 0) {
+                list.classList.remove('hidden');
+                data.results.forEach(track => {
+                    const div = document.createElement('div');
+                    div.className = "p-4 border-b hover:bg-gray-50 flex items-center gap-3 cursor-pointer";
+                    div.innerHTML = `
+                        <img src="${track.artworkUrl60}" class="w-10 h-10 rounded shadow-sm">
+                        <div class="overflow-hidden">
+                            <div class="font-bold text-[11px] truncate">${track.trackName}</div>
+                            <div class="text-[10px] opacity-40 truncate">${track.artistName}</div>
+                        </div>`;
+                    div.onclick = () => {
+                        selectedSong = {
+                            title: track.trackName,
+                            artist: track.artistName,
+                            image: track.artworkUrl100.replace('100x100bb', '400x400bb'),
+                            color: `hsl(${Math.random() * 360}, 50%, 70%)`
+                        };
+                        displaySelected();
+                        list.classList.add('hidden');
+                    };
+                    list.appendChild(div);
+                });
+            }
         }
 
-        function pickMusic(t, a, i, u) {
-            const el = document.getElementById('display-title');
-            el.dataset.info = JSON.stringify({ title: t, artist: a, image: i, color: '#'+Math.floor(Math.random()*16777215).toString(16), url: u });
-            el.innerText = t; document.getElementById('display-artist').innerText = a;
-            document.getElementById('stamp-slot').innerHTML = `<img src="${i}" class="w-24 h-24 rounded-full animate-spin-slow object-cover border-2 border-black">`;
-            document.getElementById('search-list').classList.add('hidden');
-            document.getElementById('search-bar').value = "";
-            currentAudio.src = u; currentAudio.play();
+        function displaySelected() {
+            document.getElementById('display-title').innerText = selectedSong.title;
+            document.getElementById('display-artist').innerText = selectedSong.artist;
+            document.getElementById('stamp-slot').innerHTML = `<img src="${selectedSong.image}" class="w-24 h-24 rounded-full animate-spin-slow object-cover border-2 border-black">`;
         }
 
-        // 2. Physics & Gatcha (Random Shapes)
-        function initGatchaPhysics() {
+        // 2. 물리 엔진 & 랜덤 도형 갓챠
+        function initPhysics() {
+            const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Events } = Matter;
             if (engine) { Composite.clear(engine.world); Engine.clear(engine); Render.stop(render); Runner.stop(runner); }
-            const container = document.getElementById('gatcha-canvas-container');
+            
+            const container = document.getElementById('canvas-container');
             container.innerHTML = "";
             const cw = container.clientWidth, ch = container.clientHeight;
-            
+
             engine = Engine.create();
             render = Render.create({ element: container, engine: engine, options: { width: cw, height: ch, background: 'transparent', wireframes: false } });
 
+            // 벽 생성
             const wallOpts = { isStatic: true, render: { visible: false } };
             Composite.add(engine.world, [
-                Bodies.rectangle(cw/2, ch-90, cw, 20, wallOpts),
+                Bodies.rectangle(cw/2, ch+10, cw, 20, wallOpts),
                 Bodies.rectangle(-10, ch/2, 20, ch, wallOpts),
                 Bodies.rectangle(cw+10, ch/2, 20, ch, wallOpts)
             ]);
 
+            // 랜덤 도형 생성 (기록된 데이터 기반)
             const shapes = archive.map(item => {
                 const x = Math.random() * (cw - 60) + 30;
-                const y = Math.random() * -200;
-                const type = Math.floor(Math.random() * 3);
-                const color = item.color || '#000';
+                const type = Math.floor(Math.random() * 3); // 0:원, 1:사각, 2:삼각
+                const opts = { restitution: 0.5, render: { fillStyle: item.color } };
                 let body;
-                if(type === 0) body = Bodies.circle(x, y, 22, { restitution: 0.6, render: { fillStyle: color } });
-                else if(type === 1) body = Bodies.rectangle(x, y, 40, 40, { restitution: 0.5, render: { fillStyle: color } });
-                else body = Bodies.polygon(x, y, 3, 28, { restitution: 0.5, render: { fillStyle: color } });
+                if(type === 0) body = Bodies.circle(x, -100, 25, opts);
+                else if(type === 1) body = Bodies.rectangle(x, -100, 45, 45, opts);
+                else body = Bodies.polygon(x, -100, 3, 30, opts);
                 
-                body.label = "ball"; body.songData = item; return body;
+                body.songData = item;
+                return body;
             });
 
             Composite.add(engine.world, shapes);
-            const mouseConstraint = MouseConstraint.create(engine, { mouse: Mouse.create(render.canvas), constraint: { stiffness: 0.2, render: { visible: false } } });
-            
-            Events.on(mouseConstraint, 'mousedown', (e) => {
-                if(!isGatchaActive) return;
+
+            const mouse = Mouse.create(render.canvas);
+            const mc = MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: 0.1, render: { visible: false } } });
+            Composite.add(engine.world, mc);
+
+            Events.on(mc, 'mousedown', (e) => {
                 const body = e.source.body;
-                if(body && body.label === "ball") showGatchaResult(body.songData);
+                if(body && body.songData) showResult(body.songData);
             });
 
-            Composite.add(engine.world, mouseConstraint);
-            runner = Runner.create(); Runner.run(runner, engine); Render.run(render);
+            runner = Runner.create();
+            Runner.run(runner, engine);
+            Render.run(render);
         }
 
-        // 3. UI Logic
-        function seal() {
-            const infoEl = document.getElementById('display-title');
-            if(!infoEl.dataset.info) { showToast("음악을 선택해주세요!"); return; }
-            const data = JSON.parse(infoEl.dataset.info);
-            const entry = { ...data, id: Date.now(), content: document.getElementById('diary').value, date: new Date().toISOString() };
-            archive.push(entry);
-            if(archive.length % 3 === 0) { coins++; showToast("코인 획득!"); }
-            else showToast("저장 완료");
-            const todayKey = new Date().toLocaleDateString();
-            if(!dailySongs[todayKey]) dailySongs[todayKey] = entry;
-            resetWriteView(); updateUI();
+        // 3. UI 및 저장 로직
+        function sealRecord() {
+            const diary = document.getElementById('diary').value;
+            if(!selectedSong) { alert("노래를 검색해 주세요!"); return; }
+            
+            const newEntry = { ...selectedSong, content: diary, date: new Date().toISOString() };
+            archive.push(newEntry);
+            coins++;
+            saveData();
+            alert("기록이 봉인되었습니다! (+1 🪙)");
+            location.reload(); 
         }
 
-        function updateUI() {
+        function startGatcha() {
+            if(coins <= 0) { alert("코인이 부족합니다!"); return; }
+            if(archive.length === 0) { alert("기록이 없습니다!"); return; }
+            coins--;
+            saveData();
             document.getElementById('coin-count').innerText = coins;
-            localStorage.setItem('myArchive', JSON.stringify(archive));
-            localStorage.setItem('dailySongs', JSON.stringify(dailySongs));
-            localStorage.setItem('myCoins', coins);
-            renderStaticStream();
-            renderTimeline();
+            document.getElementById('gatcha-ui').style.display = 'none';
+            document.getElementById('canvas-container').style.pointerEvents = 'auto';
+            initPhysics();
         }
 
-        function renderTimeline() {
-            const container = document.getElementById('timeline-view'); container.innerHTML = "";
-            const todayKey = new Date().toLocaleDateString();
-            const todays = archive.filter(a => new Date(a.date).toLocaleDateString() === todayKey);
-            todays.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "timeline-card shadow-sm border border-black/5";
-                card.innerHTML = `<img src="${item.image}" class="w-full h-full object-cover">`;
-                card.onclick = () => {
-                    document.getElementById('res-image').style.backgroundImage = `url(${item.image})`;
-                    document.getElementById('res-title').innerText = item.title;
-                    document.getElementById('res-artist').innerText = item.artist;
-                    document.getElementById('res-content').innerText = item.content || "...";
-                    toggleModalOverlay(true); document.getElementById('result-popup').classList.add('show');
-                };
-                container.appendChild(card);
-            });
-        }
-
-        function renderStaticStream() {
-            const container = document.getElementById('static-stream'); container.innerHTML = "";
-            const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-            months.forEach((m, i) => {
-                const row = document.createElement('div'); row.className = "month-row";
-                row.innerHTML = `<div class="month-box">${m}</div>`;
-                const grid = document.createElement('div'); grid.className = "day-grid";
-                for(let d=1; d<=31; d++) {
-                    const dot = document.createElement('div'); dot.className = "day-pixel";
-                    const key = new Date(2026, i, d).toLocaleDateString();
-                    if(dailySongs[key]) dot.style.background = dailySongs[key].color;
-                    grid.appendChild(dot);
-                }
-                row.appendChild(grid); container.appendChild(row);
-            });
-        }
-
-        function startGatchaSession() {
-            if(archive.length === 0) { showToast("기록을 먼저 작성해주세요!"); return; }
-            if(coins <= 0) { showToast("코인이 부족합니다!"); return; }
-            coins--; updateUI(); isGatchaActive = true;
-            document.getElementById('main-container').classList.add('gatcha-active');
-            document.getElementById('gatcha-canvas-container').classList.remove('hidden');
-            document.getElementById('gatcha-canvas-container').style.pointerEvents = "auto";
-            document.getElementById('coin-btn').style.display = 'none';
-            initGatchaPhysics();
-        }
-
-        function showGatchaResult(data) {
-            currentAudio.src = data.url; currentAudio.play();
-            document.getElementById('res-image').style.backgroundImage = `url(${data.image})`;
+        function showResult(data) {
+            document.getElementById('res-image').src = data.image;
             document.getElementById('res-title').innerText = data.title;
             document.getElementById('res-artist').innerText = data.artist;
-            document.getElementById('res-content').innerText = data.content || "...";
-            toggleModalOverlay(true); document.getElementById('result-popup').classList.add('show');
+            document.getElementById('res-content').innerText = data.content || "기록된 생각이 없습니다.";
+            document.getElementById('result-popup').classList.add('show');
         }
 
-        function closeResultPopup() {
-            document.getElementById('result-popup').classList.remove('show');
-            toggleModalOverlay(false); isGatchaActive = false;
-            document.getElementById('gatcha-canvas-container').classList.add('hidden');
-            document.getElementById('coin-btn').style.display = 'block';
-            currentAudio.pause();
-        }
+        function closePopup() { document.getElementById('result-popup').classList.remove('show'); }
 
-        // Helper Functions
         function changeTab(t) {
             document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('view-'+t).classList.add('active');
             document.getElementById('btn-'+t).classList.add('active');
             document.getElementById('header-text').innerText = t.toUpperCase();
-            if(t !== 'gatcha') { document.getElementById('gatcha-canvas-container').classList.add('hidden'); isGatchaActive = false; }
         }
 
-        function toggleTimeline() {
-            isTimelineOpen = !isTimelineOpen;
-            document.getElementById('static-stream').classList.toggle('slide-down', isTimelineOpen);
-            document.getElementById('timeline-view').classList.toggle('timeline-up', isTimelineOpen);
-            document.getElementById('album-main-title').innerText = isTimelineOpen ? "STREAM" : "2026";
+        function saveData() {
+            localStorage.setItem('myArchive', JSON.stringify(archive));
+            localStorage.setItem('myCoins', coins);
         }
 
-        function showToast(m) {
-            const t = document.createElement('div'); t.className = 'toast'; t.innerText = m;
-            document.getElementById('toast-container').appendChild(t);
-            setTimeout(() => t.classList.add('show'), 50);
-            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 1500);
-        }
-
-        function toggleModalOverlay(s) { document.getElementById('modal-overlay').classList.toggle('active', s); }
-        function openSettings() { toggleModalOverlay(true); document.getElementById('settings-popup').classList.add('show'); }
-        function closeSettings() { document.getElementById('settings-popup').classList.remove('show'); toggleModalOverlay(false); }
-        function clearArchive() { if(confirm("초기화?")) { localStorage.clear(); location.reload(); } }
-        function resetWriteView() {
-            currentAudio.pause(); document.getElementById('diary').value = "";
-            document.getElementById('display-title').innerText = ""; document.getElementById('display-artist').innerText = "";
-            document.getElementById('display-title').removeAttribute('data-info');
-            document.getElementById('stamp-slot').innerHTML = '<div class="w-24 h-24 border-2 border-dashed border-black/10 rounded-full flex items-center justify-center text-[10px] opacity-20 text-center uppercase">Select<br>Music</div>';
-        }
-
-        // Debounce for Search
+        // Event Listeners
         let searchTimer;
         document.getElementById('search-bar').addEventListener('input', () => {
             clearTimeout(searchTimer);
-            searchTimer = setTimeout(searchMusic, 500);
+            searchTimer = setTimeout(searchMusic, 600);
         });
 
-        // Time Display
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('top-datetime-display').innerText = now.toLocaleString();
-        }, 1000);
-
-        updateUI();
+        document.getElementById('coin-count').innerText = coins;
     </script>
 </body>
 </html>
