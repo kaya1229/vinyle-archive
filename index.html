@@ -77,7 +77,7 @@
         .animate-spin-slow { animation: spin 12s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .stream-container { background-color: transparent !important; padding : 16px; padding-top: 20px; padding-bottom: calc(100px + env(safe-area-inset-bottom)); position: absolute; top: -0; left: 0; width: 100%; height: 100%;  display: flex; flex-direction: column; justify-content: flex-start; gap: 15px; z-index: 500; transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden !important; }
+        .stream-container { background-color: transparent !important; padding : 12px; padding-top: 10px; padding-bottom: calc(100px + env(safe-area-inset-bottom)); position: absolute; top: -0; left: 0; width: 100%; height: 100%;  display: flex; flex-direction: column; justify-content: flex-start; gap: 15px; z-index: 500; transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden !important; }
         .stream-content-card{ background-color: #ffffff; border-radius: 24px; padding: 20px 15px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;}
         
         .stream-year-title { font-size: 24px; font-weight: 900; color: #000; margin-bottom: 15px; letter-spacing: -1.5px; padding-left: 5px; }
@@ -139,7 +139,7 @@
 
         <div id="view-album" class="tab-view" style="padding: 0; overflow: hidden; height: 100vh;">
             <div class="px-6 flex justify-between items-center h-20" id="album-header-ui">
-                <span id="album-main-title" class="text-[22px] font-black uppercase tracking-tighter">2026</span>
+                <span id="album-main-title" class="text-[22px] font-black uppercase tracking-tighter">Today's TIMELINE</span>
             </div>
     
             <div class="album-content-wrapper" id="swipe-area" style="position: relative; height: calc(100% - 80px); overflow: hidden;">
@@ -454,6 +454,7 @@
         header.style.opacity = "0"; // 연력이 올라올 때 뒤의 2026 헤더를 숨김
     } else {
         header.style.opacity = "1";
+        title.innerText = "Today's TIMELINE";
     }
 }
         
