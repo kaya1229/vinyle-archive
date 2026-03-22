@@ -448,9 +448,9 @@
             const container = document.getElementById('static-stream'); container.innerHTML = "";
             //2026 타이틀 동적 생성 및 삽입
             const yearTitle = document.createElement('div');
-            yearTitle.className = 'stream-year-title";
-            yearTitle.innerTExt = "2026";
-            container.appendChild(YearTitle);
+            yearTitle.className = 'stream-year-title';
+            yearTitle.innerText = "2026";
+            container.appendChild(yearTitle);
             const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
             months.forEach((mName, i) => {
                 const row = document.createElement('div'); row.className = "month-row"; 
