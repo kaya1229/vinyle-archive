@@ -451,26 +451,61 @@
         }
         
         function renderStaticStream() {
-            const container = document.getElementById('static-stream'); container.innerHTML = "";
-            //2026 타이틀 동적 생성 및 삽입
-            const yearTitle = document.createElement('div');
-            yearTitle.className = 'stream-year-title';
-            yearTitle.innerText = "2026";
-            container.appendChild(yearTitle);
-            const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-            months.forEach((mName, i) => {
-                const row = document.createElement('div'); row.className = "month-row"; 
-                row.innerHTML = `<div class="month-box" onclick="showMonthList(${i}, '${mName}')">${mName}</div>`;
-                const grid = document.createElement('div'); grid.className = "day-grid";
-                for(let d=1; d<=new Date(2026, i + 1, 0).getDate(); d++) {
-                    const dot = document.createElement('div'); dot.className = "day-pixel";
-                    const key = new Date(2026, i, d).toLocaleDateString();
-                    if(dailySongs[key]) dot.style.background = dailySongs[key].color;
-                    grid.appendChild(dot);
-                }
-                row.appendChild(grid); container.appendChild(row);
-            });
+    const container = document.getElementById('static-stream');
+    container.innerHTML = ""; // 기존 내용 비우기
+
+    // 1. 전체를 감싸는 흰색 카드(박스) 생성
+    const contentCard = document.createElement('div');
+    contentCard.className = 'stream-content-card';
+    
+    // 2. 2026 타이틀 생성 (불필요한 STREAM 글자 없이 2026만)
+    const yearTitle = document.createElement('div');
+    yearTitle.className = 'stream-year-title';
+    yearTitle.innerText = "2026";
+    contentCard.appendChild(yearTitle);
+
+    // 3. 월별 행들을 담을 컨테이너 생성 (flex-grow로 꽉 채우기 위함)
+    const rowsContainer = document.createElement('div');
+    rowsContainer.id = 'stream-rows-container';
+    rowsContainer.style.flex = "1";
+    rowsContainer.style.display = "flex";
+    rowsContainer.style.flexDirection = "column";
+    rowsContainer.style.justifyContent = "space-between";
+    rowsContainer.style.gap = "2px";
+    
+    const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    
+    months.forEach((mName, i) => {
+        const row = document.createElement('div'); 
+        row.className = "month-row"; 
+        
+        // 월 이름 박스
+        const monthBox = document.createElement('div');
+        monthBox.className = "month-box";
+        monthBox.innerText = mName;
+        monthBox.onclick = () => showMonthList(i, mName);
+        row.appendChild(monthBox);
+
+        // 그리드 생성
+        const grid = document.createElement('div'); 
+        grid.className = "day-grid";
+        
+        const daysInMonth = new Date(2026, i + 1, 0).getDate();
+        for(let d=1; d<=daysInMonth; d++) {
+            const dot = document.createElement('div'); 
+            dot.className = "day-pixel";
+            const key = new Date(2026, i, d).toLocaleDateString();
+            if(dailySongs[key]) dot.style.background = dailySongs[key].color;
+            grid.appendChild(dot);
         }
+        
+        row.appendChild(grid); 
+        rowsContainer.appendChild(row);
+    });
+
+    contentCard.appendChild(rowsContainer);
+    container.appendChild(contentCard);
+}
 
         function showMonthList(monthIdx, monthName) {
             const listContent = document.getElementById('month-list-content');
