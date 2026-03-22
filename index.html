@@ -77,7 +77,7 @@
         .animate-spin-slow { animation: spin 12s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .stream-container { background-color: transparent !important; padding : 12px; padding-top: env(safe-area-inset-top, 10px); padding-bottom: calc(100px + env(safe-area-inset-bottom)); position: absolute; top: -0; left: 0; width: 100%; height: 100%;  display: flex; flex-direction: column; justify-content: flex-start; gap: 15px; z-index: 600; transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden !important; }
+        .stream-container { background-color: transparent !important; padding : 12px; padding-top: env(safe-area-inset-top, 10px); padding-bottom: calc(100px + env(safe-area-inset-bottom)); position: absolute; top: 0; left: 0; width: 100%; height: 100%;  display: flex; flex-direction: column; justify-content: flex-start; gap: 15px; z-index: 600; transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden !important; }
         .stream-content-card{ background-color: #ffffff; border-radius: 24px; padding: 20px 15px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;}
         
         .stream-year-title { font-size: 24px; font-weight: 900; color: #000; margin-bottom: 15px; letter-spacing: -1.5px; padding-left: 5px; }
@@ -614,9 +614,10 @@
         swipeArea.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive: true});
         swipeArea.addEventListener('touchend', e => {
             const deltaY = e.changedTouches[0].clientY - touchStartY;
+            const timelineView = document.getElementById('timeline-view');
             if (Math.abs(deltaY) > 50) {
-                if (deltaY > 0 && isTimelineOpen) toggleTimeline();
-                else if (deltaY < 0 && !isTimelineOpen) toggleTimeline();
+                if (deltaY < 0 && isTimelineOpen) if(timelineView.scrollTop <= 0){toggleTimeline();}}
+            else if (deltaY > 0 && !isTimelineOpen) {toggleTimeline();
             }
         }, {passive: true});
 
