@@ -30,72 +30,117 @@
             position: relative; overflow: hidden; display: flex; flex-direction: column; 
         }
         
-        * { 
-            -ms-overflow-style: none; 
-            scrollbar-width: none; 
-            -webkit-tap-highlight-color: transparent; 
-        }
+        * { -ms-overflow-style: none; scrollbar-width: none; -webkit-tap-highlight-color: transparent; }
         *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
 
-        textarea, input {
-            -webkit-user-select: text !important;
-            user-select: text !important;
+        textarea, input { -webkit-user-select: text !important; user-select: text !important; }
+
+        /* Floating Menu System */
+        #floating-lp-container {
+            position: absolute;
+            bottom: 40px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 15px;
+            touch-action: none;
         }
 
-        #toast-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3000; pointer-events: none; display: flex; flex-direction: column; align-items: center; }
+        .lp-main-btn {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            cursor: grab;
+            z-index: 2001;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .lp-main-btn:active { cursor: grabbing; transform: scale(0.9); }
+
+        .lp-design {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff 18%, transparent 19%), 
+                        repeating-radial-gradient(circle, #333 0, #333 1px, #1a1a1a 2px, #1a1a1a 3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .sub-menu-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transform: translateY(20px) scale(0.8);
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .sub-menu-container.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .sub-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .sub-btn.active { background: #000; color: #fff; transform: scale(1.1); }
+
+        /* 기존 컴포넌트 스타일 유지 */
+        #toast-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 4000; pointer-events: none; display: flex; flex-direction: column; align-items: center; }
         .toast { background: rgba(0, 0, 0, 0.9); color: #fff; padding: 16px 28px; border-radius: 10px; font-size: 12px; font-weight: bold; text-align: center; line-height: 1.5; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px); opacity: 0; transform: scale(0.9); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .toast.show { opacity: 1; transform: scale(1); }
-
-        .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 450; display: none; pointer-events: auto; }
+        .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 2500; display: none; pointer-events: auto; }
         .modal-overlay.active { display: block; }
-
         #gatcha-canvas-container { transition: filter 0.5s ease; }
         .gatcha-active #gatcha-canvas-container { filter: blur(20px); }
-        #gatcha-blur-bg { position: absolute; inset: 0; bottom: 0; z-index: 60; background: rgba(253, 248, 239, 0); transition: all 0.5s ease; pointer-events: none; }
+        #gatcha-blur-bg { position: absolute; inset: 0; z-index: 60; background: rgba(253, 248, 239, 0); transition: all 0.5s ease; pointer-events: none; }
         .gatcha-active #gatcha-blur-bg { background: rgba(253, 248, 239, 0.4); pointer-events: auto; }
-
-        .tab-view { display: none; flex: 1; width: 100%; height: calc(100% - 100px); position: absolute; top: 80px; left: 0; padding: 20px; overflow-y: scroll; z-index: 50; }
+        .tab-view { display: none; flex: 1; width: 100%; height: calc(100% - 80px); position: absolute; top: 80px; left: 0; padding: 20px; overflow-y: scroll; z-index: 50; }
         .tab-view.active { display: flex; flex-direction: column; }
-        
         .write-btn-container { display: flex; justify-content: center; gap : 16px; margin-top: 60px; margin-bottom: 80px; }
         #view-album { padding: 0; overflow: hidden; }
-        .album-content-wrapper { position: relative; width: 100%; height: 100%; touch-action: pan-y; }
-
         #timeline-view { position: absolute; inset: 0; background: var(--paper); z-index: 10; padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: min-content; gap: 8px; overflow-y: auto; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        .timeline-card { overflow: hidden; cursor: pointer; background: #fff; position: relative; border-radius: 0; transition: transform 0.1s; user-select: none; -webkit-touch-callout: none; }
-        .size-normal { grid-column: span 1; aspect-ratio: 1 / 1; }
-        .size-large { grid-column: span 2; grid-row: span 2; aspect-ratio: 1 / 1; }
-
-        .popup-base { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 500; background: var(--paper); padding: 25px; border: 2px solid #000; width: 350px; max-height: 550px; display: none; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); flex-direction: column; }
+        .timeline-card { overflow: hidden; cursor: pointer; background: #fff; position: relative; aspect-ratio: 1/1; border-radius: 0; transition: transform 0.1s; }
+        .size-large { grid-column: span 2; grid-row: span 2; }
+        .popup-base { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 3500; background: var(--paper); padding: 25px; border: 2px solid #000; width: 350px; max-height: 550px; display: none; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); flex-direction: column; }
         .show { display: flex !important; }
         .auto-scroll { flex: 1; overflow-y: auto; padding-right: 5px; margin-top: 10px; }
-
-        .nav-bar { height: 100px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; z-index: 300; position: absolute; bottom: 0; width: 100%; }
-        .lp-circle { width: 46px; height: 46px; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; border: 1px solid #333; color: white; -webkit-touch-callout: none; }
-        .tab-btn.active .lp-circle { background: radial-gradient(circle, #fff 20%, transparent 21%), repeating-radial-gradient(circle, #ddd 0, #ddd 1px, #fff 2px, #fff 3px); border: 1px solid #fff; color: black; }
-        
         .animate-spin-slow { animation: spin 12s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .stream-container { background-color: transparent !important; padding : 12px; padding-top: env(safe-area-inset-top, 10px); padding-bottom: calc(100px + env(safe-area-inset-bottom)); position: absolute; top: 0; left: 0; width: 100%; height: 100%;  display: flex; flex-direction: column; justify-content: flex-start; gap: 15px; z-index: 600; transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden !important; }
-        .stream-content-card{ background-color: #ffffff; border-radius: 24px; padding: 20px 15px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;}
-        
-        .stream-year-title { font-size: 24px; font-weight: 900; color: #000; margin-bottom: 15px; letter-spacing: -1.5px; padding-left: 5px; }
+        .stream-container { background-color: transparent !important; padding: 12px; padding-top: env(safe-area-inset-top, 10px); padding-bottom: 120px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; z-index: 600; transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden !important; }
+        .stream-content-card{ background-color: #ffffff; border-radius: 24px; padding: 20px 15px; height: 100%; display: flex; flex-direction: column; }
+        .stream-year-title { font-size: 24px; font-weight: 900; color: #000; margin-bottom: 15px; letter-spacing: -1.5px; }
         .stream-container.slide-down { transform: translateY(0) !important; }
         .timeline-up { transform: translateY(-100%); }
-
         .month-row { display: flex; align-items: center; gap: 8px; width: 100%; flex: 1; min-height: 0; }
-        .month-box { font-size: 11px; font-weight: 800; width: 45px; height: 80%; max-height: 30px; display: flex; align-items: center; justify-content: center; background: #eee5d5; border-radius: 4px; cursor: pointer; flex-shrink: 0; -webkit-touch-callout: none; }
+        .month-box { font-size: 11px; font-weight: 800; width: 45px; height: 80%; max-height: 30px; display: flex; align-items: center; justify-content: center; background: #eee5d5; border-radius: 4px; cursor: pointer; flex-shrink: 0; }
         .day-grid { display: grid; grid-template-columns: repeat(16, 1fr); gap: 2px; flex: 1; height: 100%; align-items: center; padding-left: 8px; border-left: 1px solid #eee; }
         .day-pixel { aspect-ratio:1 / 1; width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 1px; }
-        .stream-container-slide-down { transform: translateY(0) !important;}
-        .pick-badge { position: absolute; top: 0; left: 0; background: #000; color: #fff; font-size: 8px; font-weight: 900; padding: 2px 5px; z-index: 5; letter-spacing: 1px; }
-        
-        .swipe-hint { position: absolute; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 900; opacity: 0.2; pointer-events: none; z-index: 30; }
-        .hint-down { top: 10px; }
-        .hint-up { bottom: 10px; }
-
-        #search-list { max-height: 280px; overflow-y: auto; }
+        .pick-badge { position: absolute; top: 0; left: 0; background: #000; color: #fff; font-size: 8px; font-weight: 900; padding: 2px 5px; z-index: 5; }
     </style>
 </head>
 <body>
@@ -118,8 +163,7 @@
             <div id="top-datetime-display" class="text-center font-bold mb-4 text-[13px] opacity-60"></div>
             <div class="relative w-full mb-6">
                 <input type="text" id="search-bar" placeholder="Search music..." class="w-full bg-transparent border-b-2 border-black p-2 outline-none text-[13px] italic">
-                <div id="search-list" class="hidden absolute top-full left-0 w-full border-2 border-black bg-white z-[110] rounded-xl shadow-2xl mt-1">
-                </div>
+                <div id="search-list" class="hidden absolute top-full left-0 w-full border-2 border-black bg-white z-[110] rounded-xl shadow-2xl mt-1"></div>
             </div>
             <div class="bg-white rounded-[24px] h-[380px] p-6 flex flex-col shadow-inner">
                 <div id="stamp-slot" class="mb-4 flex justify-center items-center h-28">
@@ -141,19 +185,10 @@
             <div class="px-6 flex justify-between items-center h-20" id="album-header-ui">
                 <span id="album-main-title" class="text-[22px] font-black uppercase tracking-tighter">Today's TIMELINE</span>
             </div>
-    
             <div class="album-content-wrapper" id="swipe-area" style="position: relative; height: calc(100% - 80px); overflow: hidden;">
-                <div id="timeline-view" style="height: 100%; overflow-y: auto;"></div>
-        
-                <div id="static-stream" class="stream-container">
-                    <div class = "stream-content-card">
-                        <div class ="stream-year-title">2026</div>
-                        <div id = "stream-row-container" style = "flex:1; display: flex; flex-direction: column; justify-content: space-between;">
-                        </div>
-                    </div>    
-                </div>
-        
-                <div class="swipe-hint hint-up" style="bottom: 20px; z-index: 600;">↑ SWIPE UP TO STREAM</div>
+                <div id="timeline-view"></div>
+                <div id="static-stream" class="stream-container"></div>
+                <div class="absolute bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-black opacity-20 pointer-events-none z-30">↑ SWIPE UP TO STREAM</div>
             </div>
         </div>
 
@@ -164,10 +199,15 @@
             </div>
         </div>
 
-        <div class="nav-bar">
-            <button onclick="changeTab('write')" class="tab-btn active" id="btn-write"><div class="lp-circle"><span>✎</span></div></button>
-            <button onclick="changeTab('album')" class="tab-btn" id="btn-album"><div class="lp-circle"><span>▤</span></div></button>
-            <button onclick="changeTab('gatcha')" class="tab-btn" id="btn-gatcha"><div class="lp-circle"><span>⬙</span></div></button>
+        <div id="floating-lp-container">
+            <div class="sub-menu-container" id="sub-menu">
+                <button onclick="changeTab('gatcha')" class="sub-btn" id="sub-btn-gatcha">⬙</button>
+                <button onclick="changeTab('album')" class="sub-btn" id="sub-btn-album">▤</button>
+                <button onclick="changeTab('write')" class="sub-btn active" id="sub-btn-write">✎</button>
+            </div>
+            <div class="lp-main-btn animate-spin-slow" id="lp-handle" onclick="toggleMenu()">
+                <div class="lp-design">💿</div>
+            </div>
         </div>
 
         <div id="settings-popup" class="popup-base">
@@ -175,7 +215,7 @@
             <div class="flex flex-col gap-4">
                 <div class="flex justify-between items-center px-2">
                     <span class="text-[12px] font-bold">Storage Management</span>
-                    <button onclick="clearArchive()" class="px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg font-bold text-[10px] hover:bg-red-600 hover:text-white transition-colors">CLEAR ALL DATA</button>
+                    <button onclick="clearArchive()" class="px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg font-bold text-[10px]">CLEAR ALL DATA</button>
                 </div>
             </div>
             <button onclick="closeSettings()" class="w-full py-4 bg-black text-white rounded-full font-bold mt-8">CLOSE</button>
@@ -216,23 +256,67 @@
         let archive = JSON.parse(localStorage.getItem('myArchive')) || [];
         let dailySongs = JSON.parse(localStorage.getItem('dailySongs')) || {};
         let coins = (localStorage.getItem('myCoins') === null) ? 1 : parseInt(localStorage.getItem('myCoins'));
-
         let currentAudio = new Audio();
         let engine, runner, render, isGatchaActive = false, isTimelineOpen = false;
 
         window.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
 
-        // 1. iTunes API Search & Response (JSONP)
+        // 1. Floating Menu Drag & Interaction
+        const lpContainer = document.getElementById('floating-lp-container');
+        const lpHandle = document.getElementById('lp-handle');
+        let isDragging = false, startX, startY, initialX, initialY;
+
+        lpHandle.addEventListener('pointerdown', (e) => {
+            isDragging = false;
+            startX = e.clientX; startY = e.clientY;
+            const rect = lpContainer.getBoundingClientRect();
+            initialX = rect.left; initialY = rect.top;
+            lpHandle.setPointerCapture(e.pointerId);
+        });
+
+        lpHandle.addEventListener('pointermove', (e) => {
+            if (!startX) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                isDragging = true;
+                lpContainer.style.left = `${initialX + dx}px`;
+                lpContainer.style.top = `${initialY + dy}px`;
+                lpContainer.style.bottom = 'auto'; lpContainer.style.right = 'auto';
+            }
+        });
+
+        lpHandle.addEventListener('pointerup', () => { startX = null; });
+
+        function toggleMenu() {
+            if (isDragging) return;
+            document.getElementById('sub-menu').classList.toggle('open');
+        }
+
+        function changeTab(t) {
+            if(isGatchaActive) { showToast("먼저 갓챠를 완료해주세요!"); return; }
+            currentAudio.pause();
+            document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('view-'+t).classList.add('active');
+            document.getElementById('sub-btn-'+t).classList.add('active');
+            document.getElementById('header-text').innerText = t.toUpperCase();
+            document.getElementById('sub-menu').classList.remove('open');
+            if(t === 'gatcha') {
+                document.getElementById('gatcha-canvas-container').classList.remove('hidden');
+                initGatchaPhysics();
+            } else {
+                exitGatchaMode();
+                document.getElementById('gatcha-canvas-container').classList.add('hidden');
+            }
+        }
+
+        // 2. Music Search (iTunes API)
         function searchMusic() {
             const query = document.getElementById('search-bar').value.trim();
-            if (query.length < 2) {
-                document.getElementById('search-list').classList.add('hidden');
-                return;
-            }
-
+            if (query.length < 2) { document.getElementById('search-list').classList.add('hidden'); return; }
             const oldScript = document.getElementById('itunes-script');
             if (oldScript) oldScript.remove();
-
             const script = document.createElement('script');
             script.id = 'itunes-script';
             script.src = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=5&callback=handleITunesResponse`;
@@ -248,12 +332,7 @@
                     const div = document.createElement('div');
                     div.className = "p-4 cursor-pointer border-b hover:bg-gray-50 flex items-center gap-3";
                     const artwork = track.artworkUrl100.replace('100x100bb', '400x400bb');
-                    div.innerHTML = `
-                        <img src="${track.artworkUrl60}" class="w-10 h-10 rounded shadow-sm">
-                        <div class="overflow-hidden">
-                            <div class="font-bold text-[11px] truncate text-black">${track.trackName}</div>
-                            <div class="text-[10px] opacity-40 truncate text-black">${track.artistName}</div>
-                        </div>`;
+                    div.innerHTML = `<img src="${track.artworkUrl60}" class="w-10 h-10 rounded shadow-sm"><div class="overflow-hidden"><div class="font-bold text-[11px] truncate text-black">${track.trackName}</div><div class="text-[10px] opacity-40 truncate text-black">${track.artistName}</div></div>`;
                     div.onclick = () => pickMusic(track.trackName, track.artistName, artwork, track.previewUrl);
                     list.appendChild(div);
                 });
@@ -262,133 +341,54 @@
 
         function pickMusic(t, a, i, u) {
             const el = document.getElementById('display-title');
-            el.dataset.info = JSON.stringify({ 
-                title: t, artist: a, image: i, 
-                color: `hsl(${Math.random() * 360}, 50%, 70%)`, 
-                url: u 
-            });
+            el.dataset.info = JSON.stringify({ title: t, artist: a, image: i, color: `hsl(${Math.random() * 360}, 50%, 70%)`, url: u });
             el.innerText = t; 
             document.getElementById('display-artist').innerText = a;
             document.getElementById('stamp-slot').innerHTML = `<img src="${i}" class="w-24 h-24 rounded-full animate-spin-slow object-cover border-2 border-black">`;
             document.getElementById('search-list').classList.add('hidden');
             document.getElementById('search-bar').value = "";
-            currentAudio.src = u; 
-            currentAudio.play().catch(() => showToast("미리듣기를 재생할 수 없습니다."));
+            currentAudio.src = u; currentAudio.play().catch(() => showToast("미리듣기 재생 불가"));
         }
 
-        // 2. Matter.js Physics & Random Shape Gatcha
+        // 3. Matter.js Gatcha
         function initGatchaPhysics() {
             if (engine) { Composite.clear(engine.world); Engine.clear(engine); Render.stop(render); Runner.stop(runner); }
             const container = document.getElementById('gatcha-canvas-container');
             container.innerHTML = "";
             const cw = container.clientWidth, ch = container.clientHeight;
-            
             engine = Engine.create();
-            render = Render.create({ 
-                element: container, 
-                engine: engine, 
-                options: { width: cw, height: ch, background: 'transparent', wireframes: false } 
-            });
-
+            render = Render.create({ element: container, engine: engine, options: { width: cw, height: ch, background: 'transparent', wireframes: false } });
             const wallOpts = { isStatic: true, render: { visible: false } };
-            Composite.add(engine.world, [
-                Bodies.rectangle(cw/2, ch-90, cw, 20, wallOpts), 
-                Bodies.rectangle(-10, ch/2, 20, ch, wallOpts), 
-                Bodies.rectangle(cw+10, ch/2, 20, ch, wallOpts)
-            ]);
-
+            Composite.add(engine.world, [Bodies.rectangle(cw/2, ch-90, cw, 20, wallOpts), Bodies.rectangle(-10, ch/2, 20, ch, wallOpts), Bodies.rectangle(cw+10, ch/2, 20, ch, wallOpts)]);
             const shapes = archive.map(item => {
                 const x = Math.random() * (cw - 60) + 30;
-                const type = Math.floor(Math.random() * 3); // 0:Circle, 1:Box, 2:Triangle
+                const type = Math.floor(Math.random() * 3);
                 const opts = { restitution: 0.6, render: { fillStyle: item.color || '#000' }, label: "item" };
-                let body;
-                if(type === 0) body = Bodies.circle(x, -100, 20, opts);
-                else if(type === 1) body = Bodies.rectangle(x, -100, 40, 40, opts);
-                else body = Bodies.polygon(x, -100, 3, 25, opts);
-                
-                body.songData = item;
-                return body;
+                let body = type === 0 ? Bodies.circle(x, -100, 20, opts) : type === 1 ? Bodies.rectangle(x, -100, 40, 40, opts) : Bodies.polygon(x, -100, 3, 25, opts);
+                body.songData = item; return body;
             });
             Composite.add(engine.world, shapes);
-
-            const mouse = Mouse.create(render.canvas);
-            const mouseConstraint = MouseConstraint.create(engine, { 
-                mouse: mouse, 
-                constraint: { stiffness: 0.2, render: { visible: false } } 
-            });
-            
-            Events.on(mouseConstraint, 'mousedown', (e) => {
-                if(!isGatchaActive || document.querySelector('.popup-base.show')) return;
-                const body = e.source.body;
-                if(body && body.label === "item") showGatchaResult(body.songData);
-            });
-
+            const mouse = Mouse.create(render.canvas), mouseConstraint = MouseConstraint.create(engine, { mouse: mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
+            Events.on(mouseConstraint, 'mousedown', (e) => { if(!isGatchaActive || document.querySelector('.popup-base.show')) return; const body = e.source.body; if(body && body.label === "item") showGatchaResult(body.songData); });
             Composite.add(engine.world, mouseConstraint);
-            runner = Runner.create(); 
-            Runner.run(runner, engine); 
-            Render.run(render);
+            runner = Runner.create(); Runner.run(runner, engine); Render.run(render);
             setupShakeInteraction();
         }
 
-        // 3. System Logic 유지 및 업데이트
+        // 4. System Logic
         function updateUI() {
             document.getElementById('coin-count').innerText = coins;
             localStorage.setItem('myArchive', JSON.stringify(archive));
             localStorage.setItem('dailySongs', JSON.stringify(dailySongs));
             localStorage.setItem('myCoins', coins);
-            renderStaticStream();
-            renderTimeline();
+            renderStaticStream(); renderTimeline();
         }
 
-        function showToast(message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerText = message;
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 50);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300);
-            }, 1200); 
-        }
-
-        function toggleModalOverlay(show) { 
-            const overlay = document.getElementById('modal-overlay');
-            overlay.classList.toggle('active', show); 
-        }
-
-        function openSettings() { toggleModalOverlay(true); document.getElementById('settings-popup').classList.add('show'); }
-        function closeSettings() { document.getElementById('settings-popup').classList.remove('show'); toggleModalOverlay(false); }
-        function clearArchive() { if(confirm("초기화하시겠습니까?")) { localStorage.clear(); location.reload(); } }
-        
-        function changeTab(t) {
-            if(document.querySelector('.popup-base.show')) return;
-            if(isGatchaActive) { showToast("먼저 갓챠를 완료해주세요!"); return; }
-            currentAudio.pause();
-            document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('view-'+t).classList.add('active');
-            document.getElementById('btn-'+t).classList.add('active');
-            document.getElementById('header-text').innerText = t.toUpperCase();
-            if(t === 'gatcha') {
-                document.getElementById('gatcha-canvas-container').classList.remove('hidden');
-                initGatchaPhysics();
-            } else {
-                exitGatchaMode();
-                document.getElementById('gatcha-canvas-container').classList.add('hidden');
-            }
-        }
-
-        function resetWriteView() {
-            currentAudio.pause();
-            document.getElementById('diary').value = "";
-            document.getElementById('display-title').innerText = "";
-            document.getElementById('display-artist').innerText = "";
-            document.getElementById('display-title').removeAttribute('data-info');
-            document.getElementById('search-bar').value = "";
-            document.getElementById('search-list').classList.add('hidden');
-            document.getElementById('stamp-slot').innerHTML = '<div class="w-24 h-24 border-2 border-dashed border-black/10 rounded-full flex items-center justify-center text-[10px] opacity-20 text-center">SELECT<br>MUSIC</div>';
+        function showToast(m) {
+            const c = document.getElementById('toast-container'), t = document.createElement('div');
+            t.className = 'toast'; t.innerText = m; c.appendChild(t);
+            setTimeout(() => t.classList.add('show'), 50);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 1200);
         }
 
         function seal() {
@@ -397,11 +397,10 @@
             const data = JSON.parse(infoEl.dataset.info);
             const entry = { ...data, id: Date.now(), content: document.getElementById('diary').value, date: new Date().toISOString() };
             archive.push(entry);
-            if (archive.length % 3 === 0) { coins++; showToast("3번째 기록 달성!\n코인 1개를\n 획득했습니다."); } 
-            else { showToast("기록이\n 저장되었습니다."); }
+            if (archive.length % 3 === 0) { coins++; showToast("3번째 기록!\n코인 1개 획득"); } else { showToast("저장되었습니다."); }
             const todayKey = new Date().toLocaleDateString();
             if(!dailySongs[todayKey]) dailySongs[todayKey] = entry;
-            resetWriteView(); updateUI(); 
+            resetWriteView(); updateUI();
         }
 
         function renderTimeline() {
@@ -415,17 +414,9 @@
             }, {});
             Object.values(grouped).forEach(item => {
                 const card = document.createElement('div');
-                card.className = `timeline-card ${item.count > 1 ? 'size-large' : 'size-normal'} shadow-sm`;
+                card.className = `timeline-card ${item.count > 1 ? 'size-large' : ''} shadow-sm`;
                 const isPicked = dailySongs[todayKey] && dailySongs[todayKey].title === item.title && dailySongs[todayKey].artist === item.artist;
-                card.innerHTML = `<img src="${item.image}" class="w-full h-full object-cover">
-                    ${item.count > 1 ? `<div class="absolute bottom-1 right-1 bg-black/60 text-white text-[8px] px-1.5 py-0.5 font-bold">${item.count}</div>` : ''}
-                    ${isPicked ? `<div class="pick-badge">PICKED</div>` : ''}`;
-                
-                let pressTimer;
-                const startPress = () => { pressTimer = setTimeout(() => { dailySongs[todayKey] = item; showToast(`오늘의 곡 변경 완료!`); updateUI(); }, 800); };
-                const cancelPress = () => clearTimeout(pressTimer);
-                card.onmousedown = startPress; card.onmouseup = cancelPress;
-                card.ontouchstart = startPress; card.ontouchend = cancelPress;
+                card.innerHTML = `<img src="${item.image}" class="w-full h-full object-cover">${item.count > 1 ? `<div class="absolute bottom-1 right-1 bg-black/60 text-white text-[8px] px-1.5 py-0.5 font-bold">${item.count}</div>` : ''}${isPicked ? `<div class="pick-badge">PICKED</div>` : ''}`;
                 card.onclick = () => showTimelineInfo(item);
                 container.appendChild(card);
             });
@@ -436,190 +427,93 @@
             document.getElementById('info-title').innerText = item.title;
             document.getElementById('info-artist').innerText = item.artist;
             const history = archive.filter(a => a.title === item.title && a.artist === item.artist).sort((a,b) => new Date(b.date) - new Date(a.date));
-            document.getElementById('info-history').innerHTML = history.map(h => `<div class="mb-4 border-l-2 border-black pl-3 py-1"><div class="text-[9px] font-bold opacity-30 uppercase tracking-tighter">${new Date(h.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • ${new Date(h.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div><div class="mt-1 leading-relaxed text-black">${h.content || "..."}</div></div>`).join('');
-            toggleModalOverlay(true); document.getElementById('info-popup').classList.add('show');
+            document.getElementById('info-history').innerHTML = history.map(h => `<div class="mb-4 border-l-2 border-black pl-3 py-1"><div class="text-[9px] font-bold opacity-30 uppercase">${new Date(h.date).toLocaleDateString()} • ${new Date(h.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div><div class="mt-1 leading-relaxed">${h.content || "..."}</div></div>`).join('');
+            document.getElementById('modal-overlay').classList.add('active'); document.getElementById('info-popup').classList.add('show');
             currentAudio.src = item.url; currentAudio.play();
         }
 
-        function closeInfo() { document.getElementById('info-popup').classList.remove('show'); toggleModalOverlay(false); currentAudio.pause(); }
-        
-        function toggleTimeline() { 
-    isTimelineOpen = !isTimelineOpen; 
-    document.getElementById('static-stream').classList.toggle('slide-down', isTimelineOpen); 
-    document.getElementById('timeline-view').classList.toggle('timeline-up', isTimelineOpen);
-    
-    // 이 부분이 범인이었습니다! 글자를 바꾸지 않고 2026을 유지하거나 헤더를 숨깁니다.
-    const header = document.getElementById('album-header-ui');
-    if (isTimelineOpen) {
-        header.style.opacity = "0"; // 연력이 올라올 때 뒤의 2026 헤더를 숨김
-    } else {
-        header.style.opacity = "1";
-        title.innerText = "Today's TIMELINE";
-    }
-}
-        
+        function toggleTimeline() {
+            isTimelineOpen = !isTimelineOpen;
+            document.getElementById('static-stream').classList.toggle('slide-down', isTimelineOpen);
+            document.getElementById('timeline-view').classList.toggle('timeline-up', isTimelineOpen);
+            document.getElementById('album-header-ui').style.opacity = isTimelineOpen ? "0" : "1";
+        }
+
         function renderStaticStream() {
-            const container = document.getElementById('static-stream');
-            container.innerHTML = ""; // 기존 내용 비우기
-
-            // 1. 전체를 감싸는 흰색 카드(박스) 생성
-            const contentCard = document.createElement('div');
-            contentCard.className = 'stream-content-card';
-    
-    // 2. 2026 타이틀 생성 (불필요한 STREAM 글자 없이 2026만)
-    const yearTitle = document.createElement('div');
-    yearTitle.className = 'stream-year-title';
-    yearTitle.innerText = "2026";
-    contentCard.appendChild(yearTitle);
-
-    // 3. 월별 행들을 담을 컨테이너 생성 (flex-grow로 꽉 채우기 위함)
-    const rowsContainer = document.createElement('div');
-    rowsContainer.id = 'stream-rows-container';
-    rowsContainer.style.flex = "1";
-    rowsContainer.style.display = "flex";
-    rowsContainer.style.flexDirection = "column";
-    rowsContainer.style.justifyContent = "space-between";
-    rowsContainer.style.gap = "2px";
-    
-    const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-    
-    months.forEach((mName, i) => {
-        const row = document.createElement('div'); 
-        row.className = "month-row"; 
-        
-        // 월 이름 박스
-        const monthBox = document.createElement('div');
-        monthBox.className = "month-box";
-        monthBox.innerText = mName;
-        monthBox.onclick = () => showMonthList(i, mName);
-        row.appendChild(monthBox);
-
-        // 그리드 생성
-        const grid = document.createElement('div'); 
-        grid.className = "day-grid";
-        
-        const daysInMonth = new Date(2026, i + 1, 0).getDate();
-        for(let d=1; d<=daysInMonth; d++) {
-            const dot = document.createElement('div'); 
-            dot.className = "day-pixel";
-            const key = new Date(2026, i, d).toLocaleDateString();
-            if(dailySongs[key]) dot.style.background = dailySongs[key].color;
-            grid.appendChild(dot);
+            const container = document.getElementById('static-stream'); container.innerHTML = "";
+            const contentCard = document.createElement('div'); contentCard.className = 'stream-content-card';
+            const yearTitle = document.createElement('div'); yearTitle.className = 'stream-year-title'; yearTitle.innerText = "2026";
+            contentCard.appendChild(yearTitle);
+            const rows = document.createElement('div'); rows.style.cssText = "flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:2px;";
+            const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            months.forEach((m, i) => {
+                const row = document.createElement('div'); row.className = "month-row";
+                const box = document.createElement('div'); box.className = "month-box"; box.innerText = m; box.onclick = () => showMonthList(i, m);
+                const grid = document.createElement('div'); grid.className = "day-grid";
+                const days = new Date(2026, i + 1, 0).getDate();
+                for(let d=1; d<=days; d++) {
+                    const dot = document.createElement('div'); dot.className = "day-pixel";
+                    const key = new Date(2026, i, d).toLocaleDateString();
+                    if(dailySongs[key]) dot.style.background = dailySongs[key].color;
+                    grid.appendChild(dot);
+                }
+                row.append(box, grid); rows.appendChild(row);
+            });
+            contentCard.appendChild(rows); container.appendChild(contentCard);
         }
-        
-        row.appendChild(grid); 
-        rowsContainer.appendChild(row);
-    });
 
-    contentCard.appendChild(rowsContainer);
-    container.appendChild(contentCard);
-}
-
-        function showMonthList(monthIdx, monthName) {
-            const listContent = document.getElementById('month-list-content');
-            listContent.innerHTML = "";
-            document.getElementById('month-list-title').innerText = `2026 ${monthName} `;
-            const picked = [];
-            for (let key in dailySongs) {
-                const d = new Date(key);
-                if (d.getFullYear() === 2026 && d.getMonth() === monthIdx) picked.push({ date: key, ...dailySongs[key] });
-            }
+        function showMonthList(mIdx, mName) {
+            const content = document.getElementById('month-list-content'); content.innerHTML = "";
+            document.getElementById('month-list-title').innerText = `2026 ${mName}`;
+            const picked = []; for(let k in dailySongs) { const d = new Date(k); if(d.getFullYear() === 2026 && d.getMonth() === mIdx) picked.push({date: k, ...dailySongs[k]}); }
             picked.sort((a,b) => new Date(b.date) - new Date(a.date));
-            if(picked.length === 0) listContent.innerHTML = "<div class='text-center opacity-30 py-10 text-[11px]'>NO DAILY PICKS</div>";
-            else {
-                picked.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = "flex items-center gap-4 mb-4 p-3 bg-white rounded-2xl shadow-sm border border-black/5 active:scale-95 transition-transform cursor-pointer";
-                    div.innerHTML = `<img src="${item.image}" class="w-12 h-12 rounded-full object-cover shadow-md">
-                        <div class="flex-1 min-w-0">
-                            <div class="font-bold text-[12px] uppercase truncate text-black">${item.title}</div>
-                            <div class="text-[10px] opacity-40 italic text-black">${item.artist}</div>
-                            <div class="text-[9px] font-bold mt-1 opacity-20 text-black">${new Date(item.date).toLocaleDateString()}</div>
-                        </div>`;
-                    div.onclick = () => { closeMonthList(); showTimelineInfo(item); };
-                    listContent.appendChild(div);
-                });
-            }
-            toggleModalOverlay(true); document.getElementById('month-list-popup').classList.add('show');
+            if(picked.length === 0) content.innerHTML = "<div class='text-center opacity-30 py-10 text-[11px]'>NO PICKS</div>";
+            else picked.forEach(item => {
+                const div = document.createElement('div'); div.className = "flex items-center gap-4 mb-4 p-3 bg-white rounded-2xl border border-black/5 active:scale-95 transition-transform cursor-pointer";
+                div.innerHTML = `<img src="${item.image}" class="w-12 h-12 rounded-full object-cover shadow-md"><div class="flex-1 min-w-0"><div class="font-bold text-[12px] uppercase truncate">${item.title}</div><div class="text-[10px] opacity-40 italic">${item.artist}</div></div>`;
+                div.onclick = () => { closeMonthList(); showTimelineInfo(item); }; content.appendChild(div);
+            });
+            document.getElementById('modal-overlay').classList.add('active'); document.getElementById('month-list-popup').classList.add('show');
         }
-        function closeMonthList() { document.getElementById('month-list-popup').classList.remove('show'); toggleModalOverlay(false); }
 
         function startGatchaSession() {
             if(archive.length === 0) { showToast("기록을 먼저 작성해주세요!"); return; }
             if(coins <= 0) { showToast("코인이 부족합니다!"); return; }
-            coins--; updateUI();
-            isGatchaActive = true;
+            coins--; updateUI(); isGatchaActive = true;
             document.getElementById('main-container').classList.add('gatcha-active');
-            const canvasContainer = document.getElementById('gatcha-canvas-container');
-            canvasContainer.style.zIndex = "70"; canvasContainer.style.pointerEvents = "auto";
-            document.getElementById('coin-btn').style.display = 'none';
-            document.getElementById('gatcha-guide').classList.remove('opacity-0');
-            document.getElementById('gatcha-blur-bg').style.pointerEvents = "auto";
+            const cc = document.getElementById('gatcha-canvas-container'); cc.classList.remove('hidden'); cc.style.zIndex = "70"; cc.style.pointerEvents = "auto";
+            document.getElementById('coin-btn').style.display = 'none'; document.getElementById('gatcha-guide').classList.remove('opacity-0');
         }
 
-        function exitGatchaMode() {
-            isGatchaActive = false; document.getElementById('main-container').classList.remove('gatcha-active');
-            const canvasContainer = document.getElementById('gatcha-canvas-container');
-            canvasContainer.style.zIndex = "10"; canvasContainer.style.pointerEvents = "none";
-            document.getElementById('coin-btn').style.display = 'block';
-            document.getElementById('gatcha-guide').classList.add('opacity-0');
-            document.getElementById('gatcha-blur-bg').style.pointerEvents = "none";
-        }
-
-        function showGatchaResult(data) {
-            currentAudio.src = data.url; 
-            currentAudio.play().catch(() => {});
-            document.getElementById('res-image').style.backgroundImage = `url(${data.image})`;
-            document.getElementById('res-title').innerText = data.title;
-            document.getElementById('res-artist').innerText = data.artist || "";
-            document.getElementById('res-content').innerText = data.content || "...";
-            const d = new Date(data.date);
-            document.getElementById('res-datetime').innerText = `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false})}`;
-            toggleModalOverlay(true); document.getElementById('result-popup').classList.add('show');
-            document.getElementById('gatcha-canvas-container').style.pointerEvents = "none";
-        }
-
-        function closeResultPopup() { 
-            document.getElementById('result-popup').classList.remove('show'); 
-            toggleModalOverlay(false); 
-            exitGatchaMode(); 
-            currentAudio.pause(); 
-            initGatchaPhysics(); 
-        }
+        function exitGatchaMode() { isGatchaActive = false; document.getElementById('main-container').classList.remove('gatcha-active'); const cc = document.getElementById('gatcha-canvas-container'); cc.style.zIndex = "10"; cc.style.pointerEvents = "none"; document.getElementById('coin-btn').style.display = 'block'; document.getElementById('gatcha-guide').classList.add('opacity-0'); }
+        function showGatchaResult(d) { currentAudio.src = d.url; currentAudio.play().catch(()=>{}); document.getElementById('res-image').style.backgroundImage = `url(${d.image})`; document.getElementById('res-title').innerText = d.title; document.getElementById('res-artist').innerText = d.artist; document.getElementById('res-content').innerText = d.content || "..."; document.getElementById('res-datetime').innerText = new Date(d.date).toLocaleString(); document.getElementById('modal-overlay').classList.add('active'); document.getElementById('result-popup').classList.add('show'); }
+        function closeResultPopup() { document.getElementById('result-popup').classList.remove('show'); document.getElementById('modal-overlay').classList.remove('active'); exitGatchaMode(); currentAudio.pause(); initGatchaPhysics(); }
+        function closeSettings() { document.getElementById('settings-popup').classList.remove('show'); document.getElementById('modal-overlay').classList.remove('active'); }
+        function openSettings() { document.getElementById('modal-overlay').classList.add('active'); document.getElementById('settings-popup').classList.add('show'); }
+        function closeInfo() { document.getElementById('info-popup').classList.remove('show'); document.getElementById('modal-overlay').classList.remove('active'); currentAudio.pause(); }
+        function closeMonthList() { document.getElementById('month-list-popup').classList.remove('show'); document.getElementById('modal-overlay').classList.remove('active'); }
+        function clearArchive() { if(confirm("초기화하시겠습니까?")) { localStorage.clear(); location.reload(); } }
+        function resetWriteView() { currentAudio.pause(); document.getElementById('diary').value = ""; document.getElementById('display-title').innerText = ""; document.getElementById('display-artist').innerText = ""; document.getElementById('display-title').removeAttribute('data-info'); document.getElementById('stamp-slot').innerHTML = '<div class="w-24 h-24 border-2 border-dashed border-black/10 rounded-full flex items-center justify-center text-[10px] opacity-20 text-center">SELECT<br>MUSIC</div>'; }
 
         function setupShakeInteraction() {
             let lastX = 0;
             window.addEventListener('mousemove', (e) => {
                 if(!isGatchaActive || document.querySelector('.popup-base.show')) return;
                 if(Math.abs(e.clientX - lastX) > 60) {
-                    Composite.allBodies(engine.world).forEach(body => {
-                        if(body.label === "item") {
-                            Body.applyForce(body, body.position, { x: (Math.random()-0.5)*0.02, y: -Math.random()*0.05 });
-                        }
-                    });
+                    Composite.allBodies(engine.world).forEach(body => { if(body.label === "item") Body.applyForce(body, body.position, { x: (Math.random()-0.5)*0.02, y: -Math.random()*0.05 }); });
                 }
                 lastX = e.clientX;
             });
         }
 
-        // 초기화
-        let searchTimer;
-        document.getElementById('search-bar').addEventListener('input', () => {
-            clearTimeout(searchTimer);
-            searchTimer = setTimeout(searchMusic, 500);
-        });
-
-        const swipeArea = document.getElementById('swipe-area');
-        let touchStartY = 0;
-        swipeArea.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive: true});
-        swipeArea.addEventListener('touchend', e => {
-            const deltaY = e.changedTouches[0].clientY - touchStartY;
-            const timelineView = document.getElementById('timeline-view');
-            if (Math.abs(deltaY) > 50) {
-                if (deltaY < 0 && isTimelineOpen) if(timelineView.scrollTop <= 0){toggleTimeline();}}
-            else if (deltaY > 0 && !isTimelineOpen) {toggleTimeline();
-            }
-        }, {passive: true});
+        // Init
+        let sTimer; document.getElementById('search-bar').addEventListener('input', () => { clearTimeout(sTimer); sTimer = setTimeout(searchMusic, 500); });
+        const sArea = document.getElementById('swipe-area'); let tStart = 0;
+        sArea.addEventListener('touchstart', e => { tStart = e.touches[0].clientY; }, {passive:true});
+        sArea.addEventListener('touchend', e => {
+            const dY = e.changedTouches[0].clientY - tStart;
+            if (Math.abs(dY) > 50) { if (dY < 0 && isTimelineOpen) { if(document.getElementById('timeline-view').scrollTop <= 0) toggleTimeline(); } else if (dY > 0 && !isTimelineOpen) toggleTimeline(); }
+        }, {passive:true});
 
         updateUI();
     </script>
