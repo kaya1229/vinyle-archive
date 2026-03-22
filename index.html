@@ -135,18 +135,17 @@
             </div>
         </div>
 
-        <div id="view-album" class="tab-view">
-            <div class="px-6 flex justify-between items-center mb-4">
+        <div id="view-album" class="tab-view" style="padding: 0; overflow: hidden; height: 100vh;">
+            <div class="px-6 flex justify-between items-center h-20" id="album-header-ui">
                 <span id="album-main-title" class="text-[22px] font-black uppercase tracking-tighter">2026</span>
-                <div class="flex flex-col items-end">
-                   
-                </div>
             </div>
-            <div class="album-content-wrapper" id="swipe-area">
-                <div class="swipe-hint hint-down">↓ STREAM</div>
-                <div id="timeline-view"></div>
+    
+            <div class="album-content-wrapper" id="swipe-area" style="position: relative; height: calc(100% - 80px); overflow: hidden;">
+                <div id="timeline-view" style="height: 100%; overflow-y: auto;"></div>
+        
                 <div id="static-stream" class="stream-container"></div>
-                <div class="swipe-hint hint-up">↑ TIMELINE</div>
+        
+                <div class="swipe-hint hint-up" style="bottom: 20px; z-index: 600;">↑ SWIPE UP TO STREAM</div>
             </div>
         </div>
 
