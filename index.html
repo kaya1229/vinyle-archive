@@ -8,332 +8,177 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
-        :root { --paper: #fdf8ef; --nav-bg: #1a1a1a; --vintage-dark: #2c2c2c; }
+        :root { --paper: #fdf8ef; }
         
         body { 
             font-family: 'Courier Prime', monospace; 
             background-color: #000; margin: 0; display: flex; align-items: center; justify-content: center; 
-            min-height: 100vh; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+            min-height: 100vh; overflow: hidden; 
+            -webkit-touch-callout: none !important; -webkit-user-select: none !important; user-select: none !important;
+            touch-action: none;
         }
 
-        .app-container { 
-            width: 100%; max-width: none; height: 100vh; background-color: var(--paper); 
-            position: relative; overflow: hidden; display: flex; flex-direction: column; 
-        }
+        .app-container { width: 100%; max-width: none; height: 100vh; background-color: var(--paper); position: relative; overflow: hidden; display: flex; flex-direction: column; }
         
-        * { -ms-overflow-style: none; scrollbar-width: none; -webkit-tap-highlight-color: transparent; }
-        *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
-
-        /* Floating Menu System */
-        #floating-lp-container {
-            position: absolute; bottom: 40px; right: 20px; z-index: 2000;
-            display: flex; flex-direction: column-reverse; align-items: center; gap: 15px; touch-action: none;
+        /* Navigation */
+        .nav-dropdown {
+            position: absolute; top: 65px; left: 20px; background: white; border: 2px solid #000;
+            border-radius: 18px; display: none; flex-direction: column; width: 160px; z-index: 3000;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15); overflow: hidden;
         }
+        .nav-dropdown.show { display: flex; }
+        .nav-item { padding: 14px 20px; font-size: 13px; font-weight: bold; cursor: pointer; border-bottom: 1px solid #eee; }
 
-        .lp-main-btn {
-            width: 65px; height: 65px; border-radius: 50%; background: #1a1a1a; border: 2px solid #000;
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            cursor: grab; z-index: 2001; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .lp-main-btn:active { cursor: grabbing; transform: scale(0.9); }
-        .lp-design {
-            width: 100%; height: 100%; border-radius: 50%;
-            background: radial-gradient(circle, #fff 18%, transparent 19%), 
-                        repeating-radial-gradient(circle, #333 0, #333 1px, #1a1a1a 2px, #1a1a1a 3px);
-            display: flex; align-items: center; justify-content: center; font-size: 20px; pointer-events: none;
-        }
-
-        .sub-menu-container {
-            display: flex; flex-direction: column; gap: 12px; opacity: 0; 
-            transform: translateY(20px) scale(0.8); pointer-events: none;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-        .sub-menu-container.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-
-        .sub-btn {
-            width: 50px; height: 50px; border-radius: 50%; background: white; border: 2px solid #000;
-            display: flex; align-items: center; justify-content: center; font-size: 18px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: all 0.2s;
-        }
-        .sub-btn.active { background: #000; color: #fff; transform: scale(1.1); }
-
-        /* Tab Views */
-        .tab-view { display: none; flex: 1; width: 100%; height: calc(100% - 80px); position: absolute; top: 80px; left: 0; z-index: 50; }
-        .tab-view.active { display: flex; flex-direction: column; }
-
-        /* Album & Stream Logic */
-        #view-album { padding: 0; overflow: hidden; height: 100vh; }
+        /* Timeline Layout */
         #timeline-view { 
             position: absolute; inset: 0; background: var(--paper); z-index: 10; padding: 20px; 
-            display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: min-content; gap: 8px; 
-            overflow-y: auto; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: min-content; gap: 10px; 
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
         }
-        .timeline-card { overflow: hidden; cursor: pointer; background: #fff; aspect-ratio: 1/1; position: relative; }
-        .size-large { grid-column: span 2; grid-row: span 2; }
-        .pick-badge { position: absolute; top: 0; left: 0; background: #000; color: #fff; font-size: 8px; font-weight: 900; padding: 2px 5px; z-index: 5; }
-        
-        .stream-container { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 600;
-            transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            background-color: transparent !important; padding: 12px; padding-bottom: 120px;
-        }
-        .stream-container.slide-down { transform: translateY(0) !important; }
-        .timeline-up { transform: translateY(-100%); }
-        .stream-content-card { background-color: #ffffff; border-radius: 24px; padding: 20px 15px; height: 100%; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .stream-year-title { font-size: 24px; font-weight: 900; color: #000; margin-bottom: 15px; letter-spacing: -1.5px; }
-        
-        /* Grid */
-        .month-row { display: flex; align-items: center; gap: 8px; width: 100%; flex: 1; min-height: 0; }
-        .month-box { font-size: 11px; font-weight: 800; width: 45px; height: 80%; max-height: 30px; display: flex; align-items: center; justify-content: center; background: #eee5d5; border-radius: 4px; cursor: pointer; flex-shrink: 0; }
-        .day-grid { display: grid; grid-template-columns: repeat(16, 1fr); gap: 2px; flex: 1; height: 100%; align-items: center; padding-left: 8px; border-left: 1px solid #eee; }
-        .day-pixel { aspect-ratio: 1/1; width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 1px; }
+        .timeline-card { overflow: hidden; cursor: pointer; background: #fff; aspect-ratio: 1/1; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); position: relative; }
+        .size-medium { grid-column: span 2; grid-row: span 2; border-radius: 12px; }
+        .size-large { grid-column: span 4; aspect-ratio: 16/9; border-radius: 16px; }
+        .is-picked { border: 3px solid #000 !important; }
+        .pick-badge { position: absolute; top: 8px; left: 8px; background: #000; color: #fff; font-size: 8px; font-weight: 900; padding: 2px 6px; z-index: 10; border-radius: 3px; }
+
+        /* Stream Container */
+        .stream-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 600; transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); background-color: transparent; padding: 12px; padding-bottom: 50px; }
+        .stream-container.slide-down { transform: translateY(0); }
+        .stream-content-card { background-color: #ffffff; border-radius: 28px; padding: 20px 15px; height: 100%; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .month-box { font-size: 10px; font-weight: 800; width: 45px; height: 26px; display: flex; align-items: center; justify-content: center; background: #eee5d5; border-radius: 4px; flex-shrink: 0; cursor: pointer; }
+        .day-pixel { aspect-ratio: 1/1; width: 100%; background: rgba(0,0,0,0.05); border-radius: 1px; }
 
         /* Popups */
-        .popup-base { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 3500; background: var(--paper); padding: 25px; border: 2px solid #000; width: 350px; max-height: 80vh; display: none; border-radius: 30px; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        .popup-base { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 3500; background: var(--paper); padding: 25px; border: 2px solid #000; width: 330px; max-height: 75vh; display: none; border-radius: 32px; flex-direction: column; box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
         .show { display: flex !important; }
         .auto-scroll { flex: 1; overflow-y: auto; }
-        .animate-spin-slow { animation: spin 12s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
         .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 2500; display: none; }
         .modal-overlay.active { display: block; }
+
+        /* API Search List */
+        #search-list { -webkit-overflow-scrolling: touch; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
-    <div class="app-container" id="main-container">
+    <div class="app-container" id="main-app">
         <div id="toast-container" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[4000] pointer-events-none"></div>
-        <div id="modal-overlay" class="modal-overlay"></div>
+        <div id="modal-overlay" class="modal-overlay" onclick="closeAllPopups()"></div>
 
-        <div class="app-header h-20 p-6 flex justify-between items-center z-[100]">
-            <span class="text-[14px] font-bold tracking-[3px]" id="header-text">WRITE</span>
-            <div class="flex items-center gap-2">
-                <div class="text-[11px] font-bold border-2 border-black px-4 py-1 rounded-full bg-white">🪙 <span id="coin-count">0</span></div>
-                <button onclick="openSettings()" class="w-7 h-7 flex items-center justify-center bg-white border-2 border-black rounded-full text-[14px]">⁝</button>
+        <div class="app-header h-20 p-6 flex justify-between items-center z-[100] relative">
+            <div class="flex items-center gap-1 cursor-pointer" onclick="toggleNav()">
+                <span class="text-[16px] font-bold tracking-[3px] uppercase" id="header-text">WRITE</span>
+                <span class="text-[10px] opacity-30">▼</span>
             </div>
+            <div id="nav-menu" class="nav-dropdown">
+                <div class="nav-item" onclick="changeTab('write')">✎ WRITE</div>
+                <div class="nav-item" onclick="changeTab('album')">▤ ALBUM</div>
+                <div class="nav-item" onclick="changeTab('gatcha')">⬙ GATCHA</div>
+            </div>
+            <div class="text-[12px] font-bold border-2 border-black px-4 py-1.5 rounded-full bg-white">🪙 <span id="coin-count">0</span></div>
         </div>
 
         <div id="view-write" class="tab-view active p-5">
-            <div id="top-datetime-display" class="text-center font-bold mb-4 text-[13px] opacity-60"></div>
+            <div id="top-date" class="text-center font-bold mb-4 text-[12px] opacity-40 uppercase tracking-widest"></div>
             <div class="relative w-full mb-6">
-                <input type="text" id="search-bar" placeholder="Search music..." class="w-full bg-transparent border-b-2 border-black p-2 outline-none text-[13px] italic">
-                <div id="search-list" class="hidden absolute top-full left-0 w-full border-2 border-black bg-white z-[110] rounded-xl mt-1"></div>
+                <input type="text" id="search-bar" placeholder="SEARCH MUSIC..." class="w-full bg-transparent border-b-2 border-black p-2 outline-none text-[13px]">
+                <div id="search-list" class="hidden absolute top-full left-0 w-full border-2 border-black bg-white z-[110] rounded-xl mt-1 overflow-hidden shadow-2xl"></div>
             </div>
-            <div class="bg-white rounded-[24px] h-[380px] p-6 flex flex-col shadow-inner">
-                <div id="stamp-slot" class="mb-4 flex justify-center items-center h-28">
-                    <div class="w-24 h-24 border-2 border-dashed border-black/10 rounded-full flex items-center justify-center text-[10px] opacity-20 text-center">SELECT<br>MUSIC</div>
+            <div class="bg-white rounded-[28px] h-[360px] p-6 flex flex-col border border-black/5 shadow-inner">
+                <div id="stamp-slot" class="mb-4 flex justify-center items-center h-24">
+                    <div class="w-20 h-20 border-2 border-dashed border-black/10 rounded-full flex items-center justify-center text-[9px] opacity-20 font-bold">SELECT</div>
                 </div>
-                <div id="song-info" class="text-center mb-4">
+                <div class="text-center mb-4 min-h-[40px]">
                     <div id="display-title" class="text-[16px] font-bold uppercase truncate"></div>
                     <div id="display-artist" class="text-[11px] opacity-40 italic truncate"></div>
                 </div>
-                <textarea id="diary" placeholder="Write down your thoughts..." class="w-full flex-1 bg-transparent outline-none resize-none text-[15px] border-t pt-4"></textarea>
+                <textarea id="diary" placeholder="MEMO..." class="w-full flex-1 bg-transparent outline-none resize-none text-[15px] border-t pt-4"></textarea>
             </div>
-            <div class="flex justify-center gap-4 mt-8">
-                <button onclick="seal()" class="w-5/12 py-3 bg-black text-white rounded-full font-bold text-[11px]">SEAL RECORD</button>
-                <button onclick="resetWriteView()" class="w-5/12 py-3 border-2 border-black text-black rounded-full font-bold text-[11px]">RESET</button>
-            </div>
+            <button onclick="seal()" class="w-full mt-6 py-4 bg-black text-white rounded-full font-bold text-[11px] tracking-widest">SEAL RECORD</button>
         </div>
 
         <div id="view-album" class="tab-view">
-            <div class="px-6 flex justify-between items-center h-20" id="album-header-ui">
-                <span class="text-[22px] font-black uppercase tracking-tighter">Timeline</span>
+            <div class="px-6 flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <span class="text-[22px] font-black uppercase tracking-tighter">Timeline</span>
+                    <button onclick="toggleTimeline()" class="text-[9px] font-bold border-2 border-black px-3 py-1 rounded-full bg-white" id="toggle-stream-btn">STREAM</button>
+                </div>
             </div>
-            <div class="relative h-full" id="swipe-area">
+            <div class="relative flex-1 overflow-hidden">
                 <div id="timeline-view"></div>
                 <div id="static-stream" class="stream-container"></div>
-                <div id="swipe-guide" class="absolute bottom-10 left-1/2 -translate-x-1/2 text-[10px] font-black opacity-20 pointer-events-none z-30">↑ SWIPE UP TO STREAM</div>
             </div>
         </div>
 
         <div id="view-gatcha" class="tab-view">
-            <div id="gatcha-ui" class="absolute inset-0 flex items-center justify-center z-20">
-                <button id="coin-btn" onclick="startGatchaSession()" class="bg-black text-white px-8 py-4 text-[12px] font-bold tracking-[4px] rounded-full shadow-2xl">⬙ INSERT COIN</button>
+            <div id="gatcha-ui" class="absolute inset-0 flex flex-col items-center justify-center z-20">
+                <button id="coin-btn" onclick="startGatchaSession()" class="bg-black text-white px-10 py-5 text-[12px] font-bold tracking-[4px] rounded-full shadow-2xl active:scale-95 transition-transform">⬙ INSERT COIN</button>
             </div>
             <div id="gatcha-canvas-container" class="absolute inset-0 z-10 hidden"></div>
         </div>
 
-        <div id="floating-lp-container">
-            <div class="sub-menu-container" id="sub-menu">
-                <button onclick="changeTab('gatcha')" class="sub-btn" id="sub-btn-gatcha">⬙</button>
-                <button onclick="changeTab('album')" class="sub-btn" id="sub-btn-album">▤</button>
-                <button onclick="changeTab('write')" class="sub-btn active" id="sub-btn-write">✎</button>
-            </div>
-            <div class="lp-main-btn animate-spin-slow" id="lp-handle">
-                <div class="lp-design">💿</div>
-            </div>
-        </div>
-
-        <div id="result-popup" class="popup-base">
-            <div class="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-2 border-black">
-                <div id="res-image" class="w-full h-full bg-cover bg-center animate-spin-slow"></div>
-            </div>
-            <div id="res-title" class="text-center font-bold uppercase text-[15px] mb-1 truncate px-4"></div>
-            <div id="res-artist" class="text-center text-[11px] opacity-40 italic mb-3"></div>
-            <div id="res-content" class="auto-scroll text-center text-[12px] opacity-70 italic px-4 mt-2 border-t pt-4"></div>
-            <button onclick="closeResultPopup()" class="w-full py-4 bg-black text-white rounded-full font-bold mt-4">CONFIRM</button>
+        <div id="report-popup" class="popup-base" style="background: white !important;">
+            <div class="text-[18px] font-black mb-4 border-b-2 border-black pb-2" id="report-month-title">MONTHLY</div>
+            <div id="report-list" class="auto-scroll flex flex-col gap-4"></div>
+            <button onclick="closeAllPopups()" class="w-full py-4 bg-black text-white rounded-full font-bold mt-6 text-[11px]">CLOSE</button>
         </div>
 
         <div id="info-popup" class="popup-base">
-            <div class="flex items-center gap-4 mb-4 border-b pb-4 mt-2">
-                <div id="info-image" class="w-20 h-20 bg-cover bg-center shadow-md rounded-lg"></div>
-                <div class="flex-1 min-w-0">
-                    <div id="info-title" class="font-bold uppercase text-[15px] truncate text-black"></div>
-                    <div id="info-artist" class="text-[11px] opacity-40 italic text-black"></div>
-                </div>
+            <div class="w-32 h-32 mx-auto mb-5 rounded-full overflow-hidden border-2 border-black shadow-lg">
+                <div id="info-image" class="w-full h-full bg-cover bg-center"></div>
             </div>
-            <div id="info-history" class="auto-scroll text-[12px] text-black"></div>
-            <button onclick="closeInfo()" class="w-full py-4 bg-black text-white rounded-full font-bold mt-4">BACK</button>
+            <div id="info-title" class="text-center font-bold uppercase text-[15px] mb-1 truncate px-4"></div>
+            <div id="info-artist" class="text-center text-[10px] opacity-40 italic mb-4"></div>
+            <div id="info-content" class="auto-scroll text-center text-[12px] opacity-70 italic px-4 mt-2 border-t pt-5"></div>
+            <button onclick="closeAllPopups()" class="w-full py-4 bg-black text-white rounded-full font-bold mt-6 text-[11px]">BACK</button>
         </div>
     </div>
 
     <script>
-        const { Engine, Render, Runner, Bodies, Composite, Events, Mouse, MouseConstraint, Body } = Matter;
+        const { Engine, Render, Runner, Bodies, Body, Composite, Events, Mouse, MouseConstraint } = Matter;
         let archive = JSON.parse(localStorage.getItem('myArchive')) || [];
         let dailySongs = JSON.parse(localStorage.getItem('dailySongs')) || {};
-        let coins = (localStorage.getItem('myCoins') === null) ? 1 : parseInt(localStorage.getItem('myCoins'));
+        let monthlyPicks = JSON.parse(localStorage.getItem('monthlyPicks')) || {};
+        let coins = parseInt(localStorage.getItem('myCoins')) || 1;
         let currentAudio = new Audio();
         let engine, runner, render, isGatchaActive = false, isTimelineOpen = false;
+        let lastX = 0;
 
-        // --- Floating Menu Logic ---
-        const lpContainer = document.getElementById('floating-lp-container');
-        const lpHandle = document.getElementById('lp-handle');
-        const subMenu = document.getElementById('sub-menu');
-        let isDragging = false, startX, startY, initialX, initialY;
-
-        lpHandle.addEventListener('pointerdown', (e) => {
-            isDragging = false;
-            startX = e.clientX; startY = e.clientY;
-            const rect = lpContainer.getBoundingClientRect();
-            initialX = rect.left; initialY = rect.top;
-            lpHandle.setPointerCapture(e.pointerId);
-        });
-
-        lpHandle.addEventListener('pointermove', (e) => {
-            if (startX === undefined) return;
-            const dx = e.clientX - startX; const dy = e.clientY - startY;
-            if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-                isDragging = true;
-                lpContainer.style.left = `${initialX + dx}px`;
-                lpContainer.style.top = `${initialY + dy}px`;
-                lpContainer.style.bottom = 'auto'; lpContainer.style.right = 'auto';
-            }
-        });
-
-        lpHandle.addEventListener('pointerup', (e) => {
-            lpHandle.releasePointerCapture(e.pointerId);
-            startX = undefined;
-            if (!isDragging) subMenu.classList.toggle('open');
-        });
-
-        function changeTab(t) {
-            if(isGatchaActive) return showToast("갓챠 진행 중...");
-            currentAudio.pause();
-            document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('view-'+t).classList.add('active');
-            document.getElementById('sub-btn-'+t).classList.add('active');
-            document.getElementById('header-text').innerText = t.toUpperCase();
-            subMenu.classList.remove('open');
-            if(t === 'gatcha') { document.getElementById('gatcha-canvas-container').classList.remove('hidden'); initGatchaPhysics(); }
-            else { exitGatchaMode(); document.getElementById('gatcha-canvas-container').classList.add('hidden'); }
-        }
-
-        // --- Stream (연력) Rendering ---
-        function renderStaticStream() {
-            const container = document.getElementById('static-stream'); container.innerHTML = "";
-            const contentCard = document.createElement('div'); contentCard.className = 'stream-content-card';
-            const yearTitle = document.createElement('div'); yearTitle.className = 'stream-year-title'; yearTitle.innerText = "2026";
-            contentCard.appendChild(yearTitle);
-            const rows = document.createElement('div'); rows.style.cssText = "flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:2px;";
-            const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-            months.forEach((m, i) => {
-                const row = document.createElement('div'); row.className = "month-row";
-                const box = document.createElement('div'); box.className = "month-box"; box.innerText = m;
-                const grid = document.createElement('div'); grid.className = "day-grid";
-                const days = new Date(2026, i + 1, 0).getDate();
-                for(let d=1; d<=days; d++) {
-                    const dot = document.createElement('div'); dot.className = "day-pixel";
-                    const key = new Date(2026, i, d).toLocaleDateString();
-                    if(dailySongs[key]) dot.style.background = dailySongs[key].color;
-                    grid.appendChild(dot);
-                }
-                row.append(box, grid); rows.appendChild(row);
-            });
-            contentCard.appendChild(rows); container.appendChild(contentCard);
-        }
-
-        function toggleTimeline() {
-            isTimelineOpen = !isTimelineOpen;
-            document.getElementById('static-stream').classList.toggle('slide-down', isTimelineOpen);
-            document.getElementById('timeline-view').classList.toggle('timeline-up', isTimelineOpen);
-            document.getElementById('swipe-guide').innerText = isTimelineOpen ? "↓ SWIPE DOWN TO TIMELINE" : "↑ SWIPE UP TO STREAM";
-        }
-
-        // --- core 앱 기능 ---
+        // --- Core UI & Storage ---
         function updateUI() {
             document.getElementById('coin-count').innerText = coins;
             localStorage.setItem('myArchive', JSON.stringify(archive));
             localStorage.setItem('dailySongs', JSON.stringify(dailySongs));
+            localStorage.setItem('monthlyPicks', JSON.stringify(monthlyPicks));
             localStorage.setItem('myCoins', coins);
-            renderStaticStream(); renderTimeline();
+            renderTimeline();
+            renderStaticStream();
+            document.getElementById('top-date').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         }
 
-        function renderTimeline() {
-            const container = document.getElementById('timeline-view'); container.innerHTML = "";
-            const todayKey = new Date().toLocaleDateString();
-            const todaysArchive = archive.filter(a => new Date(a.date).toLocaleDateString() === todayKey);
-            todaysArchive.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "timeline-card shadow-sm";
-                card.innerHTML = `<img src="${item.image}" class="w-full h-full object-cover">`;
-                card.onclick = () => showTimelineInfo(item);
-                container.appendChild(card);
-            });
-        }
-
-        function showTimelineInfo(item) {
-            document.getElementById('info-image').style.backgroundImage = `url(${item.image})`;
-            document.getElementById('info-title').innerText = item.title;
-            document.getElementById('info-artist').innerText = item.artist;
-            const history = archive.filter(a => a.title === item.title).sort((a,b) => new Date(b.date) - new Date(a.date));
-            document.getElementById('info-history').innerHTML = history.map(h => `<div class="mb-4 border-l-2 border-black pl-3 py-1"><div class="text-[9px] font-bold opacity-30 uppercase">${new Date(h.date).toLocaleDateString()}</div><div class="mt-1 leading-relaxed">${h.content || "..." }</div></div>`).join('');
-            document.getElementById('modal-overlay').classList.add('active'); document.getElementById('info-popup').classList.add('show');
-            currentAudio.src = item.url; currentAudio.play();
-        }
-
-        function seal() {
-            const infoEl = document.getElementById('display-title'); if(!infoEl.dataset.info) return showToast("곡을 선택하세요.");
-            const data = JSON.parse(infoEl.dataset.info);
-            const entry = { ...data, id: Date.now(), content: document.getElementById('diary').value, date: new Date().toISOString() };
-            archive.push(entry);
-            const todayKey = new Date().toLocaleDateString();
-            if(!dailySongs[todayKey]) dailySongs[todayKey] = entry;
-            showToast("기록되었습니다."); resetWriteView(); updateUI();
-        }
-
+        // --- 1) API Integration ---
         function searchMusic() {
             const query = document.getElementById('search-bar').value.trim();
             if (query.length < 2) return;
             const script = document.createElement('script');
-            script.src = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=5&callback=handleITunesResponse`;
+            script.src = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=5&callback=handleITunes`;
             document.body.appendChild(script);
         }
-
-        window.handleITunesResponse = (data) => {
+        window.handleITunes = (data) => {
             const list = document.getElementById('search-list'); list.innerHTML = "";
             if (data.results.length > 0) {
                 list.classList.remove('hidden');
                 data.results.forEach(track => {
                     const div = document.createElement('div');
-                    div.className = "p-4 cursor-pointer border-b flex items-center gap-3 text-black";
-                    div.innerHTML = `<img src="${track.artworkUrl60}" class="w-10 h-10 rounded"><div class="overflow-hidden"><div class="font-bold text-[11px] truncate">${track.trackName}</div><div class="text-[10px] opacity-40 truncate">${track.artistName}</div></div>`;
+                    div.className = "p-4 border-b flex items-center gap-4 active:bg-gray-100";
+                    div.innerHTML = `<img src="${track.artworkUrl60}" class="w-10 h-10 rounded"><div><div class="font-bold text-[12px] truncate">${track.trackName}</div><div class="text-[10px] opacity-40">${track.artistName}</div></div>`;
                     div.onclick = () => {
-                        const info = { title: track.trackName, artist: track.artistName, image: track.artworkUrl100.replace('100x100bb', '400x400bb'), url: track.previewUrl, color: `hsl(${Math.random()*360}, 50%, 70%)` };
+                        const info = { title: track.trackName, artist: track.artistName, image: track.artworkUrl100.replace('100x100bb', '600x600bb'), url: track.previewUrl, color: `hsl(${Math.random()*360}, 50%, 75%)` };
                         document.getElementById('display-title').innerText = info.title;
                         document.getElementById('display-title').dataset.info = JSON.stringify(info);
                         document.getElementById('display-artist').innerText = info.artist;
-                        document.getElementById('stamp-slot').innerHTML = `<img src="${info.image}" class="w-24 h-24 rounded-full animate-spin-slow object-cover border-2 border-black">`;
+                        document.getElementById('stamp-slot').innerHTML = `<img src="${info.image}" class="w-20 h-20 rounded-full object-cover border-2 border-black">`;
                         document.getElementById('search-list').classList.add('hidden');
                         currentAudio.src = info.url; currentAudio.play();
                     };
@@ -342,61 +187,155 @@
             }
         };
 
-        function showToast(m) {
-            const t = document.createElement('div'); t.className = "bg-black text-white px-6 py-3 rounded-full text-[12px] mb-2 shadow-xl"; t.innerText = m;
-            document.getElementById('toast-container').appendChild(t); setTimeout(() => t.remove(), 2000);
+        // --- 2) Timeline (Size Logic & Long Press) ---
+        function renderTimeline() {
+            const container = document.getElementById('timeline-view'); container.innerHTML = "";
+            const counts = {};
+            archive.forEach(a => { const d = new Date(a.date).toLocaleDateString(); counts[d] = (counts[d] || 0) + 1; });
+
+            archive.slice().reverse().forEach(item => {
+                const card = document.createElement('div');
+                const dateKey = new Date(item.date).toLocaleDateString();
+                const count = counts[dateKey];
+                
+                card.className = "timeline-card";
+                if(count === 2) card.classList.add('size-medium');
+                else if(count >= 3) card.classList.add('size-large');
+
+                const monthKey = `2026-${new Date(item.date).getMonth()}`;
+                if(monthlyPicks[monthKey] === item.id) {
+                    card.classList.add('is-picked');
+                    card.innerHTML = `<div class="pick-badge">PICKED</div>`;
+                }
+
+                card.innerHTML += `<img src="${item.image}" class="w-full h-full object-cover">`;
+
+                // 롱프레스 (시스템 메뉴 방지)
+                let timer;
+                card.onpointerdown = (e) => {
+                    timer = setTimeout(() => {
+                        if (window.navigator.vibrate) window.navigator.vibrate(60);
+                        monthlyPicks[monthKey] = item.id; updateUI();
+                    }, 800);
+                };
+                card.onpointerup = () => clearTimeout(timer);
+                card.onpointerleave = () => clearTimeout(timer);
+                card.onclick = () => { showInfo(item); };
+
+                container.appendChild(card);
+            });
         }
 
-        function resetWriteView() {
-            document.getElementById('diary').value = ""; document.getElementById('display-title').innerText = ""; 
-            document.getElementById('stamp-slot').innerHTML = '<div class="w-24 h-24 border-2 border-dashed border-black/10 rounded-full flex items-center justify-center text-[10px] opacity-20 text-center">SELECT<br>MUSIC</div>';
+        // --- 3) Stream & Monthly Report ---
+        function renderStaticStream() {
+            const container = document.getElementById('static-stream'); container.innerHTML = "";
+            const contentCard = document.createElement('div'); contentCard.className = 'stream-content-card';
+            const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            
+            months.forEach((m, i) => {
+                const row = document.createElement('div'); row.className = "flex items-center gap-2 flex-1 mb-1";
+                const mBox = document.createElement('div'); mBox.className = "month-box"; mBox.innerText = m;
+                mBox.onclick = () => showMonthlyReport(i, m);
+
+                const grid = document.createElement('div'); grid.className = "day-grid grid grid-cols-[repeat(16,1fr)] gap-[2px] flex-1";
+                for(let d=1; d<=new Date(2026, i + 1, 0).getDate(); d++) {
+                    const dot = document.createElement('div'); dot.className = "day-pixel";
+                    const key = new Date(2026, i, d).toLocaleDateString();
+                    if(dailySongs[key]) dot.style.background = dailySongs[key].color;
+                    grid.appendChild(dot);
+                }
+                row.append(mBox, grid); contentCard.appendChild(row);
+            });
+            container.appendChild(contentCard);
         }
 
-        function startGatchaSession() {
-            if(coins <= 0) return showToast("코인이 부족합니다.");
-            coins--; updateUI(); isGatchaActive = true;
-            document.getElementById('coin-btn').style.display = 'none';
-            document.getElementById('gatcha-canvas-container').classList.remove('hidden');
-            initGatchaPhysics();
+        function showMonthlyReport(monthIdx, monthName) {
+            const list = document.getElementById('report-list'); list.innerHTML = "";
+            document.getElementById('report-month-title').innerText = `${monthName} 2026`;
+            
+            const monthSongs = archive.filter(a => new Date(a.date).getMonth() === monthIdx);
+            if(monthSongs.length === 0) list.innerHTML = "<div class='text-center opacity-30 py-10'>NO RECORDS</div>";
+            
+            monthSongs.forEach(s => {
+                const item = document.createElement('div');
+                const isPicked = monthlyPicks[`2026-${monthIdx}`] === s.id;
+                item.className = `flex items-center gap-4 p-3 rounded-xl border ${isPicked ? 'border-black bg-gray-50' : 'border-transparent'}`;
+                item.innerHTML = `<div class="text-[10px] font-bold w-4">${new Date(s.date).getDate()}</div><img src="${s.image}" class="w-12 h-12 rounded shadow-sm"><div class="flex-1 min-w-0"><div class="text-[12px] font-bold truncate">${s.title}</div><div class="text-[10px] opacity-40 truncate">${s.artist}</div></div>${isPicked ? '<div class="text-[8px] font-black">PICK</div>' : ''}`;
+                item.onclick = () => showInfo(s);
+                list.appendChild(item);
+            });
+            document.getElementById('modal-overlay').classList.add('active');
+            document.getElementById('report-popup').classList.add('show');
         }
 
-        function exitGatchaMode() { isGatchaActive = false; document.getElementById('coin-btn').style.display = 'block'; }
-        
+        // --- 4) Gatcha (Shake & Shape Random) ---
         function initGatchaPhysics() {
             const container = document.getElementById('gatcha-canvas-container'); container.innerHTML = "";
-            engine = Engine.create(); render = Render.create({ element: container, engine: engine, options: { width: container.clientWidth, height: container.clientHeight, background: 'transparent', wireframes: false } });
-            const ground = Bodies.rectangle(container.clientWidth/2, container.clientHeight-50, container.clientWidth, 20, { isStatic: true, render: { visible: false } });
-            const items = archive.map(a => {
-                const body = Bodies.circle(Math.random()*container.clientWidth, -50, 20, { restitution: 0.6, render: { fillStyle: a.color } });
+            engine = Engine.create();
+            render = Render.create({ element: container, engine: engine, options: { width: container.clientWidth, height: container.clientHeight, background: 'transparent', wireframes: false } });
+            
+            const ground = Bodies.rectangle(container.clientWidth/2, container.clientHeight-10, container.clientWidth, 20, { isStatic: true, render: { visible: false } });
+            const wallL = Bodies.rectangle(0, container.clientHeight/2, 20, container.clientHeight, { isStatic: true, render: { visible: false } });
+            const wallR = Bodies.rectangle(container.clientWidth, container.clientHeight/2, 20, container.clientHeight, { isStatic: true, render: { visible: false } });
+
+            const balls = archive.map(a => {
+                const shapeType = Math.floor(Math.random() * 4); // 0:원, 1:사각, 2:삼각, 3:오각
+                const x = Math.random() * container.clientWidth;
+                const opt = { restitution: 0.6, friction: 0.1, label: "item", render: { fillStyle: a.color, strokeStyle: '#000', lineWidth: 1 } };
+                let body;
+                if(shapeType === 0) body = Bodies.circle(x, -50, 22, opt);
+                else if(shapeType === 1) body = Bodies.rectangle(x, -50, 40, 40, opt);
+                else if(shapeType === 2) body = Bodies.polygon(x, -50, 3, 25, opt);
+                else body = Bodies.polygon(x, -50, 5, 25, opt);
+                
                 body.songData = a; return body;
             });
-            Composite.add(engine.world, [ground, ...items]);
+
+            Composite.add(engine.world, [ground, wallL, wallR, ...balls]);
             const mc = MouseConstraint.create(engine, { mouse: Mouse.create(render.canvas) });
-            Events.on(mc, 'mousedown', (e) => { if(e.source.body) showGatchaResult(e.source.body.songData); });
+            Events.on(mc, 'mousedown', (e) => { if(e.source.body && e.source.body.songData) showInfo(e.source.body.songData); });
+            
+            // 흔들기 로직 (수정 전 원본 복구)
+            document.addEventListener('mousemove', (e) => {
+                if(!isGatchaActive || document.querySelector('.popup-base.show')) return;
+                if(Math.abs(e.clientX - lastX) > 60) {
+                    Composite.allBodies(engine.world).forEach(body => {
+                        if(body.label === "item") {
+                            Body.applyForce(body, body.position, { x: (Math.random()-0.5)*0.02, y: -Math.random()*0.05 });
+                        }
+                    });
+                }
+                lastX = e.clientX;
+            });
+
             Runner.run(Runner.create(), engine); Render.run(render);
         }
 
-        function showGatchaResult(d) {
-            document.getElementById('res-image').style.backgroundImage = `url(${d.image})`;
-            document.getElementById('res-title').innerText = d.title;
-            document.getElementById('res-artist').innerText = d.artist;
-            document.getElementById('res-content').innerText = d.content || "...";
+        // --- Utils ---
+        function showInfo(s) {
+            document.getElementById('info-image').style.backgroundImage = `url(${s.image})`;
+            document.getElementById('info-title').innerText = s.title;
+            document.getElementById('info-artist').innerText = s.artist;
+            document.getElementById('info-content').innerText = s.content || "...";
             document.getElementById('modal-overlay').classList.add('active');
-            document.getElementById('result-popup').classList.add('show');
-            currentAudio.src = d.url; currentAudio.play();
+            document.getElementById('info-popup').classList.add('show');
+            currentAudio.src = s.url; currentAudio.play();
         }
-
-        function closeResultPopup() { document.getElementById('result-popup').classList.remove('show'); document.getElementById('modal-overlay').classList.remove('active'); exitGatchaMode(); currentAudio.pause(); }
-        function closeInfo() { document.getElementById('info-popup').classList.remove('show'); document.getElementById('modal-overlay').classList.remove('active'); currentAudio.pause(); }
-
-        // Swipe logic
-        const sArea = document.getElementById('swipe-area'); let tStart = 0;
-        sArea.addEventListener('touchstart', e => tStart = e.touches[0].clientY, {passive:true});
-        sArea.addEventListener('touchend', e => {
-            const dY = e.changedTouches[0].clientY - tStart;
-            if (dY < -50 && !isTimelineOpen) toggleTimeline();
-            else if (dY > 50 && isTimelineOpen) toggleTimeline();
-        }, {passive:true});
+        function seal() {
+            const infoEl = document.getElementById('display-title'); if(!infoEl.dataset.info) return;
+            const data = JSON.parse(infoEl.dataset.info);
+            const entry = { ...data, id: Date.now(), content: document.getElementById('diary').value, date: new Date().toISOString() };
+            archive.push(entry);
+            const key = new Date().toLocaleDateString();
+            if(!dailySongs[key]) dailySongs[key] = entry;
+            updateUI(); resetWrite();
+        }
+        function resetWrite() { document.getElementById('diary').value = ""; document.getElementById('display-title').innerText = ""; document.getElementById('stamp-slot').innerHTML = ""; }
+        function toggleNav() { document.getElementById('nav-menu').classList.toggle('show'); }
+        function closeAllPopups() { document.querySelectorAll('.popup-base').forEach(p => p.classList.remove('show')); document.getElementById('modal-overlay').classList.remove('active'); currentAudio.pause(); }
+        function toggleTimeline() { isTimelineOpen = !isTimelineOpen; document.getElementById('static-stream').classList.toggle('slide-down'); }
+        function changeTab(t) { document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active')); document.getElementById('view-'+t).classList.add('active'); document.getElementById('header-text').innerText = t; if(t === 'gatcha') { isGatchaActive=true; document.getElementById('gatcha-canvas-container').classList.add('hidden'); document.getElementById('coin-btn').style.display='block'; } else { isGatchaActive=false; } toggleNav(); }
+        function startGatchaSession() { if(coins>0){coins--; updateUI(); document.getElementById('coin-btn').style.display='none'; document.getElementById('gatcha-canvas-container').classList.remove('hidden'); initGatchaPhysics();} }
 
         let sTimer; document.getElementById('search-bar').addEventListener('input', () => { clearTimeout(sTimer); sTimer = setTimeout(searchMusic, 500); });
         updateUI();
