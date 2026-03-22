@@ -56,7 +56,8 @@
 
         .tab-view { display: none; flex: 1; width: 100%; height: calc(100% - 100px); position: absolute; top: 80px; left: 0; padding: 20px; overflow-y: scroll; z-index: 50; }
         .tab-view.active { display: flex; flex-direction: column; }
-
+        
+        .write-btn-container { display: flex; justify-content: center; gap : 16px; margin-top: 60px; margin-bottom: 80px; }
         #view-album { padding: 0; overflow: hidden; }
         .album-content-wrapper { position: relative; width: 100%; height: 100%; touch-action: pan-y; }
 
@@ -76,7 +77,8 @@
         .animate-spin-slow { animation: spin 12s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .stream-container { position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: var(--paper); padding: 20px; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; z-index: 20; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; }
+        .stream-container { background-color: #ffffff !important; padding : 20px; padding-top: 60px; padding-bottom: calc(100px+env(safe-area-inset-bottom)); position: absolute; top: -100%; left: 0; width: 100%; height: 100%;  display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; z-index: 20; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; }
+         .stream-year-title { font-size: 32px; font-weight: 900; color: #000; margin-bottom: 24px; letter-spacing: -1px; }
         .stream-container.slide-down { transform: translateY(100%); }
         .timeline-up { transform: translateY(-100%); }
 
@@ -127,7 +129,7 @@
                 </div>
                 <textarea id="diary" placeholder="Write down your thoughts..." class="w-full flex-1 bg-transparent outline-none resize-none text-[15px] border-t pt-4"></textarea>
             </div>
-            <div class="flex justify-center gap-4 mt-6">
+            <div class="write-btn-container">
                 <button onclick="seal()" class="w-5/12 py-3 bg-black text-white rounded-full font-bold text-[11px]">SEAL RECORD</button>
                 <button onclick="resetWriteView()" class="w-5/12 py-3 border-2 border-black text-black rounded-full font-bold text-[11px]">RESET</button>
             </div>
@@ -444,6 +446,11 @@
         
         function renderStaticStream() {
             const container = document.getElementById('static-stream'); container.innerHTML = "";
+            //2026 타이틀 동적 생성 및 삽입
+            const yearTitle = document.createElement('div');
+            yearTitle.className = 'stream-year-title";
+            yearTitle.innerTExt = "2026";
+            container.appendChild(YearTitle);
             const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
             months.forEach((mName, i) => {
                 const row = document.createElement('div'); row.className = "month-row"; 
