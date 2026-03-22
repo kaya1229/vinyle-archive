@@ -77,9 +77,9 @@
         .animate-spin-slow { animation: spin 12s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .stream-container { background-color: #ffffff !important; padding : 20px; padding-top: 60px; padding-bottom: calc(100px+env(safe-area-inset-bottom)); position: absolute; top: -100%; left: 0; width: 100%; height: 100%;  display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; z-index: 20; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; }
+        .stream-container { background-color: #ffffff !important; padding : 20px; padding-top: 60px; padding-bottom: calc(100px+env(safe-area-inset-bottom)); position: absolute; top: -100%; left: 0; width: 100%; height: 100%;  display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; z-index: 200; transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; }
          .stream-year-title { font-size: 32px; font-weight: 900; color: #000; margin-bottom: 24px; letter-spacing: -1px; }
-        .stream-container.slide-down { transform: translateY(100%); }
+        .stream-container.slide-down { transform: translateY(0) !important; }
         .timeline-up { transform: translateY(-100%); }
 
         .month-row { display: flex; align-items: center; gap: 10px; width: 100%; height: 32px; }
