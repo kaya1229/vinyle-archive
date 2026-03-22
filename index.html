@@ -444,19 +444,26 @@
         function closeInfo() { document.getElementById('info-popup').classList.remove('show'); toggleModalOverlay(false); currentAudio.pause(); }
         
         function toggleTimeline() { 
-            isTimelineOpen = !isTimelineOpen; 
-            document.getElementById('static-stream').classList.toggle('slide-down', isTimelineOpen); 
-            document.getElementById('timeline-view').classList.toggle('timeline-up', isTimelineOpen);
-            document.getElementById('album-main-title').innerText = isTimelineOpen ? "STREAM" : "2026"; 
-        }
+    isTimelineOpen = !isTimelineOpen; 
+    document.getElementById('static-stream').classList.toggle('slide-down', isTimelineOpen); 
+    document.getElementById('timeline-view').classList.toggle('timeline-up', isTimelineOpen);
+    
+    // 이 부분이 범인이었습니다! 글자를 바꾸지 않고 2026을 유지하거나 헤더를 숨깁니다.
+    const header = document.getElementById('album-header-ui');
+    if (isTimelineOpen) {
+        header.style.opacity = "0"; // 연력이 올라올 때 뒤의 2026 헤더를 숨김
+    } else {
+        header.style.opacity = "1";
+    }
+}
         
         function renderStaticStream() {
-    const container = document.getElementById('static-stream');
-    container.innerHTML = ""; // 기존 내용 비우기
+            const container = document.getElementById('static-stream');
+            container.innerHTML = ""; // 기존 내용 비우기
 
-    // 1. 전체를 감싸는 흰색 카드(박스) 생성
-    const contentCard = document.createElement('div');
-    contentCard.className = 'stream-content-card';
+            // 1. 전체를 감싸는 흰색 카드(박스) 생성
+            const contentCard = document.createElement('div');
+            contentCard.className = 'stream-content-card';
     
     // 2. 2026 타이틀 생성 (불필요한 STREAM 글자 없이 2026만)
     const yearTitle = document.createElement('div');
