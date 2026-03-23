@@ -68,6 +68,10 @@
         .size-large { grid-column: span 2; grid-row: span 2; aspect-ratio: 1 / 1; }
 
         .popup-base { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 500; background: var(--paper); padding: 25px; border: 2px solid #000; width: 350px; max-height: 550px; display: none; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); flex-direction: column; }
+        #info-popup{z-index: 2000 !important;}
+        #month-list-popup{z-index: 1000 !important;}
+        #settings-popup, #result-popup{z-index: 500;}
+        .popup-base img, #info-image {border: none !important; box-shadow: none !important; outline: none !important;}
         .show { display: flex !important; }
         .auto-scroll { flex: 1; overflow-y: auto; padding-right: 5px; margin-top: 10px; }
 
