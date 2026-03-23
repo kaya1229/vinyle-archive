@@ -465,6 +465,8 @@ function changeTab(t) {
         }
 
         function showTimelineInfo(item, fromMonthList = false) {
+            if (window.currentAudio){
+                window.currentAudio.pause();}
             document.getElementById('info-image').style.backgroundImage = `url(${item.image})`;
             document.getElementById('info-title').innerText = item.title;
             document.getElementById('info-artist').innerText = item.artist;
@@ -473,25 +475,26 @@ function changeTab(t) {
             const monthPopup = document.getElementById('month-list-popup');
             const infoPopup = document.getElementById('info-popup');
             const backBtn = document.querySelector('#info-popup button'); // 버튼의 클릭 이벤트를 상황에 맞게 재설정
+            backBtn.onclick = () {
+                if (window.currentAudio){
+                    window.currentAudio.pause();
+                    window.currentAudio.currentTime = 0;}
+            if(fromMonthList && monthPopup){
+                infoPopup.classList.remove('show');
+                monthPopup.classList.remove('force-hide');
+                monthPopup.classList.add('show');
+                monthPopup.style.setProperty('display','flex','important');
+                toggleModalOverlay(true);}
+            else{closeInfo();}};
             if(fromMonthList && monthPopup){
                 monthPopup.classList.add('force-hide');
                 monthPopup.classList.remove('show');
-                backBtn.onclick = () =>{
-                    infoPopup.classList.remove('show');
-                    monthPopup.classList.remove('force-hide');
-                    monthPopup.classList.add('show');
-                    monthPopup.style.setProperty('display','flex','important');
-                    toggleModalOverlay(true);
-                    if(window.currentAudio) currentAudio.pause();
-                };
                 backBtn.innerText = "BACK TO LIST";}
-            else{
-                if(monthPopup) monthPopup.classList.add('force-hide');
-                backBtn.onclick = () =>{
-                    closeInfo();}
-                backBtn.innerText = "BACK";}
-            
-            toggleModalOverlay(true); document.getElementById('info-popup').classList.add('show');
+            else{if(monthPopup) monthPopup.classList.add('force-hide');
+                BackBtn.innerText = "BACK";}
+            toggleModalOverlay(true);
+            infoPopup.classList.add('show');
+              
             currentAudio.src = item.url; currentAudio.loop = true;
             currentAudio.play();
         }
