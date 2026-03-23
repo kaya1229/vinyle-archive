@@ -142,7 +142,8 @@
                     <div id="display-title" class="text-[16px] font-bold uppercase truncate"></div>
                     <div id="display-artist" class="text-[11px] opacity-40 italic truncate"></div>
                 </div>
-                <textarea id="diary" placeholder="Write down your thoughts..." class="w-full flex-1 bg-transparent outline-none resize-none text-[15px] border-t pt-4"></textarea>
+                <textarea id="diary" placeholder="Write down..." class="w-full bg-transparent outline-none resize-none text-[15px] border-t pt-4" style = "height: 450px !important; min-height: 200px; 
+                    oninput = "this.style.height = '';this.style.height = this.scrollHeight + 'px'display: block;"></textarea>
             </div>
             <div class="write-btn-container">
                 <button onclick="seal()" class="w-5/12 py-3 bg-black text-white rounded-full font-bold text-[11px]">SEAL RECORD</button>
