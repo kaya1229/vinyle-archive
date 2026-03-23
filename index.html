@@ -470,19 +470,24 @@ function changeTab(t) {
             const history = archive.filter(a => a.title === item.title && a.artist === item.artist).sort((a,b) => new Date(b.date) - new Date(a.date));
             document.getElementById('info-history').innerHTML = history.map(h => `<div class="mb-4 border-l-2 border-black pl-3 py-1"><div class="text-[9px] font-bold opacity-30 uppercase tracking-tighter">${new Date(h.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • ${new Date(h.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div><div class="mt-1 leading-relaxed text-black">${h.content || "..."}</div></div>`).join('');
             const monthPopup = document.getElementById('month-list-popup');
+            const infoPopup = document.getElementById('info-popup');
             const backBtn = document.querySelector('#info-popup button'); // 버튼의 클릭 이벤트를 상황에 맞게 재설정
             if(fromMonthList && monthPopup){
                 monthPopup.classList.add('force-hide');
                 monthPopup.classList.remove('show');
                 backBtn.onclick = () =>{
-                    closeInfo();
+                    infoPopup.classList.remove('show');
                     monthPopup.classList.remove('force-hide');
                     monthPopup.classList.add('show');
+                    monthPopup.style.setProperty('display','flex','important');
+                    toggleModalOverlay(true);
+                    if(window.currentAudio) currentAudio.pause();
                 };
                 backBtn.innerText = "BACK TO LIST";}
             else{
                 if(monthPopup) monthPopup.classList.add('force-hide');
-                backBtn.onclick = closeInfo;
+                backBtn.onclick = () =>{
+                    closeInfo();}
                 backBtn.innerText = "BACK";}
             
             toggleModalOverlay(true); document.getElementById('info-popup').classList.add('show');
@@ -494,7 +499,11 @@ function changeTab(t) {
             currentAudio.pause();
             document.getElementById('month-list-popup').classList.add('show');}
         
-        function closeInfo() { document.getElementById('info-popup').classList.remove('show'); toggleModalOverlay(false); currentAudio.pause(); }
+        function closeInfo() { document.getElementById('info-popup').classList.remove('show'); 
+                              const monthPopup = document.getElementById('month-list-popup');
+                              if (monthPopup) monthPopup.classList.remove('force-hide);
+                              toggleModalOverlay(false); currentAudio.pause();
+                              if(window.currentAudio} currentAudio.pause();}
         
        function toggleTimeline() {
     isTimelineOpen = !isTimelineOpen;
