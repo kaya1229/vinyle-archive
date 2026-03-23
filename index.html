@@ -505,8 +505,8 @@ function changeTab(t) {
                               if (monthPopup) monthPopup.classList.remove('force-hide');
                               const isMonthPopupVisible = monthPopup && monthPopup.classList.contains('show');
                               if (isMonthPopupVisible){toggleModalOverlay(true);}
-                              else {toggleModalOverlay(false); currentAudio.pause();}
-                              if(window.currentAudio) currentAudio.pause();}
+                              else {toggleModalOverlay(false); }
+                              if(window.currentAudio) window.currentAudio.pause();}
         
        function toggleTimeline() {
     isTimelineOpen = !isTimelineOpen;
