@@ -190,7 +190,7 @@
         </div>
 
         <div id="result-popup" class="popup-base">
-            <div class="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-2 border-black">
+            <div class="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden">
                 <div id="res-image" class="w-full h-full bg-cover bg-center animate-spin-slow"></div>
             </div>
             <div id="res-title" class="text-center font-bold uppercase text-[15px] mb-1 truncate px-4"></div>
@@ -202,7 +202,7 @@
 
         <div id="info-popup" class="popup-base">
             <div class="flex items-center gap-4 mb-4 border-b pb-4 mt-2">
-                <div id="info-image" class="w-20 h-20 bg-cover bg-center shadow-md rounded-lg"></div>
+                <div id="info-image" class="w-20 h-20 bg-cover bg-center rounded-lg"></div>
                 <div class="flex-1 min-w-0">
                     <div id="info-title" class="font-bold uppercase text-[15px] truncate"></div>
                     <div id="info-artist" class="text-[11px] opacity-40 italic"></div>
@@ -226,6 +226,7 @@
         let coins = (localStorage.getItem('myCoins') === null) ? 1 : parseInt(localStorage.getItem('myCoins'));
 
         let currentAudio = new Audio();
+        currentAudio.loop = true;
         let engine, runner, render, isGatchaActive = false, isTimelineOpen = false;
 
         window.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
@@ -278,7 +279,7 @@
             });
             el.innerText = t; 
             document.getElementById('display-artist').innerText = a;
-            document.getElementById('stamp-slot').innerHTML = `<img src="${i}" class="w-24 h-24 rounded-full animate-spin-slow object-cover border-2 border-black">`;
+            document.getElementById('stamp-slot').innerHTML = `<img src="${i}" class="w-24 h-24 rounded-full animate-spin-slow object-cover">`;
             document.getElementById('search-list').classList.add('hidden');
             document.getElementById('search-bar').value = "";
             currentAudio.src = u; 
@@ -387,7 +388,7 @@ function changeTab(t) {
     if (targetView) targetView.classList.add('active');
 
     // 3. (중요) 상단 헤더 텍스트 변경
-    const headerText = document.getElementById('header-text');
+    const headerText = document.getElementById('current-tab-title');
     if (headerText) headerText.innerText = t.toUpperCase();
 
     // 4. (중요) 탭 이동 후 드롭다운 메뉴 자동으로 닫기
@@ -461,10 +462,15 @@ function changeTab(t) {
             document.getElementById('info-artist').innerText = item.artist;
             const history = archive.filter(a => a.title === item.title && a.artist === item.artist).sort((a,b) => new Date(b.date) - new Date(a.date));
             document.getElementById('info-history').innerHTML = history.map(h => `<div class="mb-4 border-l-2 border-black pl-3 py-1"><div class="text-[9px] font-bold opacity-30 uppercase tracking-tighter">${new Date(h.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • ${new Date(h.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div><div class="mt-1 leading-relaxed text-black">${h.content || "..."}</div></div>`).join('');
+            const backBtn = document.querySelector('#info-popup button'); // 버튼의 클릭 이벤트를 상황에 맞게 재설정
+            backBtn.onclick = fromMonthlist? backtoMonthlist : closeInfo;
             toggleModalOverlay(true); document.getElementById('info-popup').classList.add('show');
             currentAudio.src = item.url; currentAudio.play();
         }
-
+        function backToMonthlist(){
+            document.getElementById('info-popup').classList.remove('show');
+            currentAudio.pause();}
+        
         function closeInfo() { document.getElementById('info-popup').classList.remove('show'); toggleModalOverlay(false); currentAudio.pause(); }
         
        function toggleTimeline() {
@@ -548,19 +554,21 @@ function changeTab(t) {
                 const d = new Date(key);
                 if (d.getFullYear() === 2026 && d.getMonth() === monthIdx) picked.push({ date: key, ...dailySongs[key] });
             }
-            picked.sort((a,b) => new Date(b.date) - new Date(a.date));
+            picked.sort((a,b) => new Date(a.date) - new Date(b.date));
             if(picked.length === 0) listContent.innerHTML = "<div class='text-center opacity-30 py-10 text-[11px]'>NO DAILY PICKS</div>";
             else {
                 picked.forEach(item => {
                     const div = document.createElement('div');
                     div.className = "flex items-center gap-4 mb-4 p-3 bg-white rounded-2xl shadow-sm border border-black/5 active:scale-95 transition-transform cursor-pointer";
-                    div.innerHTML = `<img src="${item.image}" class="w-12 h-12 rounded-full object-cover shadow-md">
+                    div.innerHTML = `
+                        <div class="text-[12px] font-bold mt-1 opacity-20 text-black">${new Date(item.date).toLocaleDateString()}</div>
+                        <img src="${item.image}" class="w-12 h-12 rounded-full object-cover shadow-md">    
+                           
                         <div class="flex-1 min-w-0">
-                            <div class="font-bold text-[12px] uppercase truncate text-black">${item.title}</div>
                             <div class="text-[10px] opacity-40 italic text-black">${item.artist}</div>
-                            <div class="text-[9px] font-bold mt-1 opacity-20 text-black">${new Date(item.date).toLocaleDateString()}</div>
+                             <div class="font-bold text-[12px] uppercase truncate text-black">${item.title}</div>
                         </div>`;
-                    div.onclick = () => { closeMonthList(); showTimelineInfo(item); };
+                    div.onclick = () => { showTimelineInfo(item); };
                     listContent.appendChild(div);
                 });
             }
