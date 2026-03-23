@@ -610,6 +610,7 @@ function changeTab(t) {
             currentAudio.pause(); 
             initGatchaPhysics(); 
         }
+        let isCoolingDown = false;
 
         function setupShakeInteraction() {
             let lastX = 0;
@@ -646,7 +647,7 @@ function changeTab(t) {
         });
             //힘을 가하는 로직 공통화
             function applyShakerForce(){
-                isCoolingdown = true;
+                isCoolingDown = true;
                 Composite.allBodies(engine.world).forEach(body =>{
                     if(body.label == "item"){
                         Body.applyForce(body, body.position, {
