@@ -123,6 +123,7 @@
                    <div class="p-4 font-bold text-[13px] border-b hover:bg-gray-50" onclick="changeTab('album')">▤ ALBUM</div>
                    <div class="p-4 font-bold text-[13px] hover:bg-gray-50" onclick="changeTab('gatcha')">⬙ GATCHA</div>
                 </div>
+              <div class = "flex items-center gap-3 ml-auto">
                 <div class="text-[11px] font-bold border-2 border-black px-4 py-1 rounded-full bg-white">🪙 <span id="coin-count">0</span></div>
                 <button onclick="openSettings()" class="w-7 h-7 flex items-center justify-center bg-white border-2 border-black rounded-full text-[14px] hover:bg-black hover:text-white transition-colors">⁝</button>
             </div>
@@ -502,7 +503,9 @@ function changeTab(t) {
         function closeInfo() { document.getElementById('info-popup').classList.remove('show'); 
                               const monthPopup = document.getElementById('month-list-popup');
                               if (monthPopup) monthPopup.classList.remove('force-hide');
-                              toggleModalOverlay(false); currentAudio.pause();
+                              const isMonthPopupVisible = montPopup && monthPopup.classList.contains('show');
+                              if (isMonthPopupVisible){toggleModalOverlay(true);
+                              else toggleModalOverlay(false); currentAudio.pause();
                               if(window.currentAudio) currentAudio.pause();}
         
        function toggleTimeline() {
