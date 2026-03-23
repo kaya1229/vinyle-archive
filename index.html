@@ -62,7 +62,7 @@
         #view-album { padding: 0; overflow: hidden; }
         .album-content-wrapper { position: relative; width: 100%; height: 100vh !important; overflowL hidden; }
 
-        #timeline-view { position: fixed; top :80px; left:0; right:0;bottom: 20px; height: auto !important;background: var(--paper); z-index: 10; padding: 20px; 
+        #timeline-view { position: relative; top :80px; left:0; right:0;bottom: 20px; height: auto !important;background: var(--paper); z-index: 10; padding: 20px; 
                         padding-bottom: 40px; display: grid; grid-template-columns: repeat(20, 1fr); grid-auto-rows: min-content; gap: 8px; overflow-y: auto; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .timeline-card { overflow: hidden; cursor: pointer; background: #fff; position: relative; border-radius: 0; transition: transform 0.1s; user-select: none; -webkit-touch-callout: none; }
         .size-normal { grid-column: span 1; aspect-ratio: 1 / 1; }
@@ -144,7 +144,7 @@
                     <div id="display-artist" class="text-[11px] opacity-40 italic truncate"></div>
                 </div>
                 <textarea id="diary" placeholder="Write down..." class="w-full bg-transparent outline-none resize-none text-[15px] border-t pt-4" style = "height: 450px !important; min-height: 200px; 
-                    oninput = "this.style.height = '';this.style.height = this.scrollHeight + 'px'display: block;"></textarea>
+                    oninput = "this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
             </div>
             <div class="write-btn-container">
                 <button onclick="seal()" class="w-5/12 py-3 bg-black text-white rounded-full font-bold text-[11px]">SEAL RECORD</button>
