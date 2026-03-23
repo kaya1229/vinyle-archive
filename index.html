@@ -451,21 +451,29 @@ function changeTab(t) {
                 const cancelPress = () => clearTimeout(pressTimer);
                 card.onmousedown = startPress; card.onmouseup = cancelPress;
                 card.ontouchstart = startPress; card.ontouchend = cancelPress;
-                card.onclick = () => showTimelineInfo(item);
+                card.onclick = () => showTimelineInfo(item,false);
                 container.appendChild(card);
             });
         }
 
-        function showTimelineInfo(item) {
+        function showTimelineInfo(item, fromMonthList = false) {
             document.getElementById('info-image').style.backgroundImage = `url(${item.image})`;
             document.getElementById('info-title').innerText = item.title;
             document.getElementById('info-artist').innerText = item.artist;
             const history = archive.filter(a => a.title === item.title && a.artist === item.artist).sort((a,b) => new Date(b.date) - new Date(a.date));
             document.getElementById('info-history').innerHTML = history.map(h => `<div class="mb-4 border-l-2 border-black pl-3 py-1"><div class="text-[9px] font-bold opacity-30 uppercase tracking-tighter">${new Date(h.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • ${new Date(h.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div><div class="mt-1 leading-relaxed text-black">${h.content || "..."}</div></div>`).join('');
+            
             const backBtn = document.querySelector('#info-popup button'); // 버튼의 클릭 이벤트를 상황에 맞게 재설정
-            backBtn.onclick = fromMonthlist? backtoMonthlist : closeInfo;
+            if(fromMonthList){
+                backBtn.onclick = backToMonthList;
+                backBtn.innerText = "BACK TO LIST";}
+            else{
+                backBtn.onclick = closeInfo;
+                backBtn.innerText = "BACK";}
+            
             toggleModalOverlay(true); document.getElementById('info-popup').classList.add('show');
-            currentAudio.src = item.url; currentAudio.play();
+            currentAudio.src = item.url; currentAudio.loop = true;
+            currentAudio.play();
         }
         function backToMonthlist(){
             document.getElementById('info-popup').classList.remove('show');
