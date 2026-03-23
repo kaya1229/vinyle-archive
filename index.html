@@ -84,7 +84,7 @@
         .animate-spin-slow { animation: spin 12s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .stream-container { background-color: transparent !important; padding : 12px; padding-top: env(safe-area-inset-top, 10px); padding-bottom: env(safe-area-inset-bottom,20px); position: absolute; top: 0; left: 0; width: 100%; height: 100vh%;  display: flex; flex-direction: column; justify-content: flex-start; gap: 15px; z-index: 600; transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden !important; }
+        .stream-container { background-color: transparent !important; padding : 12px; padding-top: env(safe-area-inset-top, 10px); padding-bottom: env(safe-area-inset-bottom,15px); position: absolute; top: 0; left: 0; width: 100%; height: 100vh%;  display: flex; flex-direction: column; justify-content: flex-start; gap: 15px; z-index: 600; transform: translateY(-100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden !important; }
         .stream-content-card{ background-color: #ffffff; border-radius: 24px; padding: 15px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;}
         
         .stream-year-title { font-size: 24px; font-weight: 900; color: #000; margin-bottom: 10px; letter-spacing: -1.5px; padding-left: 5px; }
@@ -93,7 +93,7 @@
 
         .month-row { display: flex; align-items: center; gap: 8px; width: 100%; flex: 1; min-height: 0; }
         .month-box { font-size: 11px; font-weight: 800; width: 45px; height: 80%; max-height: 30px; display: flex; align-items: center; justify-content: center; background: #eee5d5; border-radius: 4px; cursor: pointer; flex-shrink: 0; -webkit-touch-callout: none; }
-        .day-grid { display: grid; grid-template-columns: repeat(16, 1fr); gap: 2px; flex: 1; height: auto; align-items: center; padding:2px 0; padding-left: 8px; border-left: 1px solid #eee; }
+        .day-grid { display: grid; grid-template-columns: repeat(16, 1fr); gap: 4px; flex: 1; height: auto; align-items: center; padding:2px 0; padding-left: 8px; border-left: 1px solid #eee; }
         .day-pixel { aspect-ratio:1 / 1 !important; width: 100%; max-width: 15px; background: rgba(0,0,0,0.05); border-radius: 1px; object-fit: cover; }
         .stream-container-slide-down { transform: translateY(0) !important;}
         .pick-badge { position: absolute; top: 0; left: 0; background: #000; color: #fff; font-size: 8px; font-weight: 900; padding: 2px 5px; z-index: 5; letter-spacing: 1px; }
