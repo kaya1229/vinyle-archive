@@ -58,11 +58,11 @@
         .tab-view.active { display: flex; flex-direction: column; }
         #nav-menu {display:none;}
         #nav-menu.show {display: flex !important;}
-        .write-btn-container { display: flex; justify-content: center; gap : 16px; margin-top: 60px; margin-bottom: 80px; }
+        .write-btn-container { display: flex; justify-content: center; gap : 16px; margin-top: 40px; margin-bottom: 80px; }
         #view-album { padding: 0; overflow: hidden; }
         .album-content-wrapper { position: relative; width: 100%; height: 100%; touch-action: pan-y; }
 
-        #timeline-view { position: absolute; top :80px; left:0; right:0;height:calc(100vh-80px) !important; background: var(--paper); z-index: 10; padding: 20px; 
+        #timeline-view { position: absolute; top :80px; left:0; right:0;bottom: 80px !important; background: var(--paper); z-index: 10; padding: 20px; 
                         padding-bottom: 50px; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: min-content; gap: 8px; overflow-y: auto; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .timeline-card { overflow: hidden; cursor: pointer; background: #fff; position: relative; border-radius: 0; transition: transform 0.1s; user-select: none; -webkit-touch-callout: none; }
         .size-normal { grid-column: span 1; aspect-ratio: 1 / 1; }
@@ -471,7 +471,7 @@ function changeTab(t) {
             
             const backBtn = document.querySelector('#info-popup button'); // 버튼의 클릭 이벤트를 상황에 맞게 재설정
             if(fromMonthList){
-                document.getElementById('mont-list-popup').classList.remove('show')
+                document.getElementById('month-list-popup').classList.remove('show')
                 backBtn.onclick = backToMonthList;
                 backBtn.innerText = "BACK TO LIST";}
             else{
