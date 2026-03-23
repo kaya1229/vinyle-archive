@@ -646,6 +646,7 @@ function changeTab(t) {
         });
             //힘을 가하는 로직 공통화
             function applyShakerForce(){
+                isCoolingdown = true;
                 Composite.allBodies(engine.world).forEach(body =>{
                     if(body.label == "item"){
                         Body.applyForce(body, body.position, {
@@ -655,7 +656,7 @@ function changeTab(t) {
                     }
                 });
                 setTimeout(()=>{
-                    isCollingDown = false;},500);}
+                    isCoolingDown = false;},500);}
 
         // 초기화
         let searchTimer;
