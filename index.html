@@ -613,6 +613,8 @@ function changeTab(t) {
 
         function setupShakeInteraction() {
             let lastX = 0;
+            let lastAccX = 0, lastAccY =0, lastAccZ = 0;
+            const SHAKE_THRESHOLD = 15; // 흔들림 감도( 숫자가 낮을수록 예민함)
             window.addEventListener('mousemove', (e) => {
                 if(!isGatchaActive || document.querySelector('.popup-base.show')) return;
                 if(Math.abs(e.clientX - lastX) > 60) {
@@ -624,7 +626,36 @@ function changeTab(t) {
                 }
                 lastX = e.clientX;
             });
-        }
+
+            //모바일용 흔들기
+            window.addEventListener('devicemotion',(event) => {
+                if(!isGatchaActive || document.querySelector('.popup-base.show') || isCoolingDown) return;
+
+                const acc = event.accelerationIncludingGravity;
+                if(!acc) return;
+
+                //이전 값과의 차이 계산(변화량)
+                let delta = Math.abs(acc.x - lastAccX) + Math.abs(acc.y -lastAccY) + Math.abs(acc.z -lastAccZ);
+
+                if (delta > SHAKE_THRESHOLD){
+                    applyShakerForce();
+                }
+                lastAccX = acc.x;
+                lastAccY = acc.y;
+                lastAccZ = acc.z;
+        });
+            //힘을 가하는 로직 공통화
+            function applyShakerForce(){
+                Composite.allBodies(engine.world).forEach(body =>{
+                    if(body.label == "item"){
+                        Body.applyForce(body, body.position, {
+                            x: (Math.random() -0.5)*0.05,
+                            y: -Math.random()*0.08
+                        });
+                    }
+                });
+                setTimeout(()=>{
+                    isCollingDown = false;},500);}
 
         // 초기화
         let searchTimer;
