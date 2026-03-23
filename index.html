@@ -475,7 +475,7 @@ function changeTab(t) {
             const monthPopup = document.getElementById('month-list-popup');
             const infoPopup = document.getElementById('info-popup');
             const backBtn = document.querySelector('#info-popup button'); // 버튼의 클릭 이벤트를 상황에 맞게 재설정
-            backBtn.onclick = () {
+            backBtn.onclick = () => {
                 if (window.currentAudio){
                     window.currentAudio.pause();
                     window.currentAudio.currentTime = 0;}
@@ -491,7 +491,7 @@ function changeTab(t) {
                 monthPopup.classList.remove('show');
                 backBtn.innerText = "BACK TO LIST";}
             else{if(monthPopup) monthPopup.classList.add('force-hide');
-                BackBtn.innerText = "BACK";}
+                backBtn.innerText = "BACK";}
             toggleModalOverlay(true);
             infoPopup.classList.add('show');
               
